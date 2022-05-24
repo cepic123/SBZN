@@ -1,0 +1,12 @@
+package rules;
+
+import game.helper.model.Game;
+import game.helper.model.enums.Genre;
+
+rule "FPS"
+    when
+        $g: Game( genre == Genre.FPS)
+    then
+        $g.setName("FPS GAME");
+        update($g);
+end
