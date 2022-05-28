@@ -1,27 +1,52 @@
 package game.helper.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+@Entity
+@Table(name = "users")
 public class User {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
+	@Column(nullable = false)
 	private String username;
+	@Column(nullable = false)
 	private String password;
+	@Column(nullable = false)
 	private String name;
+	@Column(nullable = false)
 	private String lastname;
-	private List<Review> reviews;
+	@OneToMany(mappedBy = "user")
+	private List<Review> reviews = new ArrayList<>();
 	
-	public User(String username, String password, String name, String lastname, List<Review> reviews) {
+	public User(String username, String password, String name, String lastname) {
 		super();
 		this.username = username;
 		this.password = password;
 		this.name = name;
 		this.lastname = lastname;
-		this.reviews = reviews;
 	}
 
 	public User() {
 		super();
 	}
+	
+	public Integer getId() {
+		return id;
+	}
 
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	
 	public String getUsername() {
 		return username;
 	}

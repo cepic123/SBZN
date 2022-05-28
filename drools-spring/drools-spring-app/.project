@@ -3,7 +3,6 @@
 	<name>drools-spring-app</name>
 	<comment></comment>
 	<projects>
-		<project>drools-rules</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

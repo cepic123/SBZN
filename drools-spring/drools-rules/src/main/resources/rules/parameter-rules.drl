@@ -1,0 +1,20 @@
+
+package rules;
+
+import game.helper.model.dto.GameResultDTO;
+import game.helper.model.dto.ParametersDTO;
+import game.helper.model.enums.Genre;
+import game.helper.model.Game;
+
+rule "Genres"
+	agenda-group "genres"
+	//no-loop
+    when
+        $g: GameResultDTO($genres: game.genres)
+        Genre($genre: value) from $genres
+        $pdto: ParametersDTO(genres contains "RPG")
+    then
+    	System.out.println("EVO ME");
+        $g.setPoints($g.getPoints()+5);
+        update($g);
+end

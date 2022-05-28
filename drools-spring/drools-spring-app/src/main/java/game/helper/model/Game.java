@@ -1,32 +1,78 @@
 package game.helper.model;
 
-import game.helper.model.enums.Genre;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+
+import game.helper.model.enums.Genre;
+@Entity
 public class Game {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
+	@Column(nullable = false)
 	private String name;
-	private Genre genre;
+	@ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name="GENRE",
+            joinColumns=@JoinColumn(name="GAME_ID")
+    )
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = true, name = "genre")
+	private List<Genre> genres;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "studio_id", nullable = false)
 	private DeveloperStudio studio;
+	@Column(nullable = false)
 	private double price;
+	@Column(nullable = false)
 	private double lenght;
+	@Column(nullable = false)
 	private boolean isMultiplayer;
+	@Column(nullable = false)
 	private boolean isOnline;
+	@OneToMany(mappedBy = "game")
+	private List<Review> reviews = new ArrayList<>();
 	
 	public Game() {
 		super();
 	}
 
-	public Game(String name, Genre genre, DeveloperStudio studio, double price, double lenght, boolean isMultiplayer,
+	public Game(String name, DeveloperStudio studio, double price, double lenght, boolean isMultiplayer,
 			boolean isOnline) {
 		super();
 		this.name = name;
-		this.genre = genre;
 		this.studio = studio;
 		this.price = price;
 		this.lenght = lenght;
 		this.isMultiplayer = isMultiplayer;
 		this.isOnline = isOnline;
 	}
+	
+	public Integer getId() {
+		return id;
+	}
 
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	
 	public String getName() {
 		return name;
 	}
@@ -35,12 +81,12 @@ public class Game {
 		this.name = name;
 	}
 
-	public Genre getGenre() {
-		return genre;
+	public List<Genre> getGenres() {
+		return genres;
 	}
 
-	public void setGenre(Genre genre) {
-		this.genre = genre;
+	public void setGenre(List<Genre> genres) {
+		this.genres = genres;
 	}
 
 	public DeveloperStudio getStudio() {
@@ -82,4 +128,14 @@ public class Game {
 	public void setOnline(boolean isOnline) {
 		this.isOnline = isOnline;
 	}
+
+	public List<Review> getReviews() {
+		return reviews;
+	}
+
+	public void setReviews(List<Review> reviews) {
+		this.reviews = reviews;
+	}
+	
+	
 }
