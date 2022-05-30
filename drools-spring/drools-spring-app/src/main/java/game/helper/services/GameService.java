@@ -1,10 +1,11 @@
 package game.helper.services;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collector;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 
 import org.kie.api.runtime.KieContainer;
@@ -16,16 +17,22 @@ import org.springframework.transaction.annotation.Transactional;
 import game.helper.model.Game;
 import game.helper.model.Review;
 import game.helper.model.User;
+
+import game.helper.model.dto.GameMatchDTO;
+
 import game.helper.model.dto.GameResultDTO;
 import game.helper.model.dto.ListGameResultDTO;
 import game.helper.model.dto.ParametersDTO;
 import game.helper.model.dto.TopListDTO;
+import game.helper.model.dto.UserMatchDTO;
 import game.helper.model.dto.UserHistoryDTO;
 import game.helper.model.enums.Genre;
 import game.helper.repository.GameRepo;
 import game.helper.repository.ReviewRepo;
 import game.helper.repository.StudioRepo;
 import game.helper.repository.UserRepo;
+
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
@@ -36,7 +43,7 @@ public class GameService {
 	private final UserRepo userRepository;
 	private final StudioRepo studioRepository;
 	private final ReviewRepo reviewRepository;
-	
+
 	@Autowired
 	public GameService(KieContainer kieContainer, GameRepo gameRepository, UserRepo userRepository,
 			StudioRepo studioRepository, ReviewRepo reviewRepository) {
@@ -55,21 +62,66 @@ public class GameService {
 		return g;
 	}
 
+
 	public List<TopListDTO> getRecommendations(ParametersDTO parametersDto, Integer userId) {
 		
 		List<GameResultDTO> gamesFromFirstFlow = firstFlow(parametersDto, userId);
 		List<GameResultDTO> gamesFromSecondFlow = secondFlow(userId);
-		
-		return gamesFromFirstFlow
-				.stream()
-				.map(TopListDTO::new)
-				.collect(Collectors.toList());
+
+		return null;
+//		return gamesFromSecondFlow
+//				.stream()
+//				.map(TopListDTO::new)
+//				.collect(Collectors.toList());
 	}
 
 	private List<GameResultDTO> secondFlow(Integer userId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+		User u = userRepository.findById(userId).orElse(null);
+		List<User> users = userRepository.findAll();
+		List<UserMatchDTO> umDTOS = new ArrayList<UserMatchDTO>();
+		
+		KieSession kieSession = kieContainer.newKieSession();
+
+		for (User other_user : users) {
+			if (other_user.getId() != Integer.parseInt(userId)) {
+				UserMatchDTO umDTO = new UserMatchDTO();
+				umDTO.setUser(u);
+				umDTO.setReviews(other_user.getReviews());
+				umDTO.setOtherUser(other_user);
+				kieSession.insert(umDTO);
+				umDTOS.add(umDTO);
+			}
+		}
+		kieSession.getAgenda().getAgendaGroup("users").setFocus();
+		kieSession.fireAllRules();
+		
+		List<Game> games = gameRepository.findAll();
+		List<Game> userGames = u.getReviews().stream().map(r -> r.getGame()).collect(Collectors.toList());
+		List<GameMatchDTO> gmDTOS = new ArrayList<GameMatchDTO>();
+		
+		for (Game g : games) {
+			if(userGames.contains(g)) continue;
+			GameMatchDTO gmDTO = new GameMatchDTO();
+			gmDTO.setGame(g);
+			for (UserMatchDTO umDTO : umDTOS) {
+				kieSession.insert(gmDTO);
+				kieSession.insert(umDTO);
+			}
+			gmDTOS.add(gmDTO);
+		}
+
+		kieSession.getAgenda().getAgendaGroup("games").setFocus();
+		kieSession.fireAllRules();
+		kieSession.dispose();
+
+		for (GameMatchDTO gmDTO : gmDTOS) {
+			System.out.println();
+			System.out.println("GAME NAME: " + gmDTO.getGame().getName());
+			System.out.println("GAME RATING: " + gmDTO.getRating());
+
+    }
+      return null;
+		}
 
 	private List<GameResultDTO> firstFlow(ParametersDTO parametersDto, Integer userId) {
 		List<Game> games = gameRepository.findAll();

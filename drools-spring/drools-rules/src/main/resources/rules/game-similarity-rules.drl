@@ -1,0 +1,134 @@
+package rules;
+
+import game.helper.model.dto.GameResultDTO;
+import game.helper.model.dto.UserMatchDTO;
+import game.helper.model.dto.GameMatchDTO;
+import game.helper.model.dto.ParametersDTO;
+import game.helper.model.enums.Genre;
+import game.helper.model.enums.MatchCoeficient;
+import game.helper.model.Game;
+import game.helper.model.Review;
+import game.helper.model.User;
+import java.util.ArrayList;
+import java.util.List;
+
+//USER_LOW_MATCH, USER_MID_MATCH, USER_HIGH_MATCH 
+rule "Game rating based on user similarity - USER_LOW"
+	agenda-group "games"
+	lock-on-active
+	salience 10
+    when    
+        $umDTO: UserMatchDTO($other_user_reviews: otherUser.reviews,
+        					 $user_reviews: user.reviews,
+        					 matchCoeficient == MatchCoeficient.USER_LOW_MATCH)
+        					 
+        $gmDTO: GameMatchDTO($game: game)
+		//$cnd: Review(game.id != $game.id) from $user_reviews
+        $match: Review($game == game) from $other_user_reviews
+    then
+		//System.out.println("LOW");
+		//System.out.println($game.getName());
+		//System.out.println($umDTO.getOtherUser().getUsername());
+		$gmDTO.setNoUserLow($gmDTO.getNoUserLow() + 1);
+		//System.out.println($gmDTO.getNoUserLow());
+        update($gmDTO);
+end
+
+rule "Game rating based on user similarity - USER_MID"
+	agenda-group "games"
+	lock-on-active
+	salience 10
+    when    
+        $umDTO: UserMatchDTO($other_user_reviews: otherUser.reviews, 
+        					 $user_reviews: user.reviews,
+        					 matchCoeficient == MatchCoeficient.USER_MID_MATCH)
+        					 
+        $gmDTO: GameMatchDTO($game: game)
+        //Review(game.id != $game.id) from $user_reviews
+        $match: Review($game == game) from $other_user_reviews
+    then
+    	//System.out.println("MID");
+		//System.out.println($game.getName());
+		//System.out.println($umDTO.getOtherUser().getUsername());
+		$gmDTO.setNoUserMid($gmDTO.getNoUserMid() + 1);
+        //System.out.println($gmDTO.getNoUserMid());
+        update($gmDTO);
+end
+
+rule "Game rating based on user similarity - USER_HIGH"
+	agenda-group "games"
+	lock-on-active
+	salience 10
+    when    
+        $umDTO: UserMatchDTO($other_user_reviews: otherUser.reviews, 
+        					 $user_reviews: user.reviews, 
+        					 matchCoeficient == MatchCoeficient.USER_HIGH_MATCH)
+        					 
+        $gmDTO: GameMatchDTO($game: game)
+        //Review(game.id != $game.id) from $user_reviews
+        $match: Review($game == game) from $other_user_reviews
+    then
+    	//System.out.println("HIGH");
+    	//System.out.println($game.getName());
+    	//System.out.println($umDTO.getOtherUser().getUsername());
+		$gmDTO.setNoUserHigh($gmDTO.getNoUserHigh() + 1);
+		//System.out.println($gmDTO.getNoUserHigh());
+        update($gmDTO);
+end
+
+rule "GAME similarity categorisation - LOW"
+	agenda-group "games"
+	//no-loop
+	salience 5
+    when    
+        $gmDTO: GameMatchDTO(noUserLow >= 3)
+    then
+    	System.out.println("LOW " + $gmDTO.getGame().getName());
+    	$gmDTO.setgLow(true);
+        update($gmDTO);
+end
+
+rule "GAME similarity categorisation - MID"
+	agenda-group "games"
+	//no-loop
+	salience 5
+    when    
+        $gmDTO: GameMatchDTO(noUserMid >= 2)
+    then
+    	System.out.println("MID " + $gmDTO.getGame().getName());
+    	$gmDTO.setgMid(true);
+        update($gmDTO);
+end
+
+rule "GAME similarity categorisation - HIGH"
+	agenda-group "games"
+	//no-loop
+	salience 5
+    when    
+        $gmDTO: GameMatchDTO(noUserHigh >= 1)
+    then
+    	System.out.println("HIGH " + $gmDTO.getGame().getName());
+    	$gmDTO.setgHigh(true);
+        update($gmDTO);
+end
+
+rule "CALCULATE SCORE"
+	agenda-group "games"
+	//no-loop
+	salience 2
+    when    
+        $gmDTO: GameMatchDTO()
+    then
+    	System.out.println("ALMOST THEREEE ALMOST THEREEE ALMOST THEREEE ALMOST THEREEE ");
+    	Double i = 0.0;
+    	Double bonus = 0.0;
+    	if($gmDTO.isgLow()) i+= 1;
+    	if($gmDTO.isgMid()) i+= 2;
+    	if($gmDTO.isgHigh()) i+= 3;
+    	if($gmDTO.isgLow() && $gmDTO.isgMid() && $gmDTO.isgHigh()) bonus = 20.0;
+    	else if($gmDTO.isgMid() && $gmDTO.isgHigh()) bonus = 15.0;
+    	else if($gmDTO.isgLow() && $gmDTO.isgHigh()) bonus = 10.0;
+    	else if($gmDTO.isgLow() && $gmDTO.isgMid()) bonus = 5.0;
+    	$gmDTO.setRating($gmDTO.getGrade() * i + bonus);
+        update($gmDTO);
+end

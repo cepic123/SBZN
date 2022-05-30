@@ -2,8 +2,9 @@ INSERT INTO users (username, password, name, lastname) VALUES
 ('user1', 'user1', 'Pera', 'Peric'),
 ('user2', 'user2', 'Mika', 'Mikic'),
 ('user3', 'user3', 'Nikola', 'Nikolic'),
-('user4', 'user4', 'Nikola', 'Nikolic'),
-('user5', 'user5', 'Nikola', 'Nikolic');
+('user4', 'user4', 'Mare', 'Maric'),
+('user5', 'user5', 'Rade', 'Radovic'),
+('user6', 'user6', 'Mirko', 'Mirkovic');
 
 INSERT INTO developer_studio (name, address) VALUES
 ('Ubisoft', 'Mite Cenica 56'),
@@ -42,6 +43,17 @@ INSERT INTO review (score, created_at, game_id, user_id) VALUES
 (3, '2021-1-3 12:43:33', 3, 3),
 (4, '2021-1-3 12:43:33', 4, 3),
 (5, '2021-1-3 12:43:33', 5, 3),
-(4, '2021-1-3 12:43:33', 1, 4),
-(4, '2021-1-3 12:43:33', 2, 4),
-(4, '2021-1-3 12:43:33', 3, 4);
+(5, '2021-1-3 12:43:33', 1, 4),
+(5, '2021-1-3 12:43:33', 2, 4),
+(3, '2021-1-3 12:43:33', 4, 4),
+(5, '2021-1-3 12:43:33', 1, 5),
+(5, '2021-1-3 12:43:33', 2, 5),
+(4, '2021-1-3 12:43:33', 3, 5),
+(3, '2021-1-3 12:43:33', 4, 5),
+(3, '2021-1-3 12:43:33', 5, 5),
+(5, '2021-1-3 12:43:33', 1, 6),
+(4, '2021-1-3 12:43:33', 3, 6),
+(5, '2021-1-3 12:43:33', 5, 6),
+(4, '2021-1-3 12:43:33', 2, 6),
+(3, '2021-1-3 12:43:33', 4, 6);
+

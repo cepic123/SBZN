@@ -72,7 +72,4 @@ public class GameResultDTO {
 	public void setReviewq(int reviewq) {
 		this.reviewq = reviewq;
 	}
-	
-	
-	
 }
