@@ -4,21 +4,29 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collector;
-import java.util.stream.Collectors;
+import java.util.HashSet;
+import java.util.Set;
+
 
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import game.helper.model.Game;
 import game.helper.model.Review;
 import game.helper.model.User;
+
 import game.helper.model.dto.GameMatchDTO;
+
 import game.helper.model.dto.GameResultDTO;
+import game.helper.model.dto.ListGameResultDTO;
 import game.helper.model.dto.ParametersDTO;
 import game.helper.model.dto.TopListDTO;
 import game.helper.model.dto.UserMatchDTO;
+import game.helper.model.dto.UserHistoryDTO;
+import game.helper.model.enums.Genre;
 import game.helper.repository.GameRepo;
 import game.helper.repository.ReviewRepo;
 import game.helper.repository.StudioRepo;
@@ -54,8 +62,9 @@ public class GameService {
 		return g;
 	}
 
-	public List<TopListDTO> getRecommendations(ParametersDTO parametersDto, String userId) {
 
+	public List<TopListDTO> getRecommendations(ParametersDTO parametersDto, Integer userId) {
+		
 		List<GameResultDTO> gamesFromFirstFlow = firstFlow(parametersDto, userId);
 		List<GameResultDTO> gamesFromSecondFlow = secondFlow(userId);
 
@@ -66,8 +75,8 @@ public class GameService {
 //				.collect(Collectors.toList());
 	}
 
-	private List<GameResultDTO> secondFlow(String userId) {
-		User u = userRepository.findById(Integer.parseInt(userId)).orElse(null);
+	private List<GameResultDTO> secondFlow(Integer userId) {
+		User u = userRepository.findById(userId).orElse(null);
 		List<User> users = userRepository.findAll();
 		List<UserMatchDTO> umDTOS = new ArrayList<UserMatchDTO>();
 		
@@ -105,38 +114,66 @@ public class GameService {
 		kieSession.fireAllRules();
 		kieSession.dispose();
 
-//		for (UserMatchDTO umDTO : umDTOS) {
-//			System.out.println("USERNAME: " + umDTO.getOtherUser().getUsername());
-//			System.out.println("MATCHES: " + umDTO.getNo_matches());
-//			System.out.println("MATCHES: " + umDTO.getMatchCoeficient());
-//		}
 		for (GameMatchDTO gmDTO : gmDTOS) {
 			System.out.println();
 			System.out.println("GAME NAME: " + gmDTO.getGame().getName());
 			System.out.println("GAME RATING: " + gmDTO.getRating());
-//			System.out.println("LOW:  " + gmDTO.isgLow());
-//			System.out.println("MID: " + gmDTO.isgMid());
-//			System.out.println("HIGH: " + gmDTO.isgHigh());
+
+    }
+      return null;
 		}
-		return null;
+
+	private List<GameResultDTO> firstFlow(ParametersDTO parametersDto, Integer userId) {
+		List<Game> games = gameRepository.findAll();
+		
+		List<GameResultDTO> gamesDTO = games
+				.stream()
+				.map(game -> new GameResultDTO(game, parametersDto))
+				.collect(Collectors.toList());
+		
+		ListGameResultDTO list = new ListGameResultDTO(gamesDTO);
+		UserHistoryDTO history = extractUserHistory(userId);
+		System.out.println(history);
+		
+		KieSession kieSession = kieContainer.newKieSession();
+		kieSession.insert(list);
+		kieSession.insert(history);
+		kieSession.getAgenda().getAgendaGroup("parameters").setFocus();
+		kieSession.fireAllRules();
+		kieSession.dispose();
+		
+		return gamesDTO;
 	}
 
-	private List<GameResultDTO> firstFlow(ParametersDTO parametersDto, String userId) {
-		List<Game> games = gameRepository.findAll();
-
-		List<GameResultDTO> gamesDTO = games.stream().map(GameResultDTO::new).collect(Collectors.toList());
-
-		for (GameResultDTO gameDTO : gamesDTO) {
-//			for(Genre genre : parametersDto.getGenres()) {
-			KieSession kieSession = kieContainer.newKieSession();
-			kieSession.insert(gameDTO);
-//				kieSession.insert(genre);
-			kieSession.getAgenda().getAgendaGroup("genres").setFocus();
-			kieSession.fireAllRules();
-			kieSession.dispose();
-//			}
+	private UserHistoryDTO extractUserHistory(Integer userId) {
+		Optional<User> userOpt = userRepository.findById(userId);
+		if(userOpt.isEmpty()) {
+			throw new RuntimeException("invalid user id");
 		}
-
-		return gamesDTO;
+		User user = userOpt.get();
+		
+		double sumPrice = 0;
+		double sumLength = 0;
+		Set<Genre> genres = new HashSet();
+		Set<String> studios = new HashSet();
+		
+		for(Review review : user.getReviews()) {
+			genres.addAll(review.getGame().getGenres());
+			studios.add(review.getGame().getStudio().getName());
+			sumPrice += review.getGame().getPrice();
+			sumLength += review.getGame().getLenght();
+		}
+		
+		UserHistoryDTO history = new UserHistoryDTO();
+		history.setGenres(genres.stream()
+                  .collect(Collectors.toList()));
+		
+		history.setStudios(studios.stream()
+                .collect(Collectors.toList()));
+		
+		history.setAvgLength(sumLength/user.getReviews().size());
+		history.setAvgPrice(sumPrice/user.getReviews().size());
+		
+		return history;
 	}
 }

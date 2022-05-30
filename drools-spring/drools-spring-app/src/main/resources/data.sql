@@ -56,3 +56,4 @@ INSERT INTO review (score, created_at, game_id, user_id) VALUES
 (5, '2021-1-3 12:43:33', 5, 6),
 (4, '2021-1-3 12:43:33', 2, 6),
 (3, '2021-1-3 12:43:33', 4, 6);
+

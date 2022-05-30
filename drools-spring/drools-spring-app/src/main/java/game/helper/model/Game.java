@@ -36,7 +36,7 @@ public class Game {
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = true, name = "genre")
 	private List<Genre> genres;
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "studio_id", nullable = false)
 	private DeveloperStudio studio;
 	@Column(nullable = false)
@@ -137,5 +137,11 @@ public class Game {
 		this.reviews = reviews;
 	}
 	
-	
+	public double getGrade() {
+		Integer sum = 0;
+		for(Review review : this.reviews) {
+			sum += review.getScore();
+		}
+		return sum / (double) this.reviews.size();
+	}
 }

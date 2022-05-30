@@ -1,20 +1,102 @@
 
 package rules;
-
+import game.helper.model.dto.ListGameResultDTO;
 import game.helper.model.dto.GameResultDTO;
 import game.helper.model.dto.ParametersDTO;
 import game.helper.model.enums.Genre;
 import game.helper.model.Game;
 
+
+
 rule "Genres"
-	agenda-group "genres"
-	//no-loop
+	agenda-group "parameters"
+	salience 5
+	lock-on-active
     when
-        $g: GameResultDTO($genres: game.genres)
-        Genre($genre: value) from $genres
-        $pdto: ParametersDTO(genres contains "RPG")
+    	$l: ListGameResultDTO($list: list) 
+        $g: GameResultDTO($genresGame: game.genres, $genresParam: parameters.genres) from $list
+        Genre($genresParam contains value) from $genresGame
     then
-    	System.out.println("EVO ME");
-        $g.setPoints($g.getPoints()+5);
-        update($g);
+    	System.out.println("EVO ME ZANR: " + $g.getGame().getName() + "broj bodova: " + $g.getPoints());
+        $g.setPoints($g.getPoints()+1);
+        update($l);
+end
+
+rule "Studio"
+	agenda-group "parameters"
+	salience 4
+	lock-on-active
+    when
+    	$l: ListGameResultDTO($list: list) 
+        $g: GameResultDTO($gameStudio: game.studio.name, $studios: parameters.studios) from $list
+        String( this == $gameStudio) from $studios
+    then
+    	System.out.println("EVO ME STUDIO: " + $g.getGame().getName() + "broj bodova: " + $g.getPoints());
+        $g.setPoints($g.getPoints()+3);
+        update($l);
+end
+
+rule "Length"
+	agenda-group "parameters"
+	salience 3
+	lock-on-active
+    when
+    	$l: ListGameResultDTO($list: list) 
+        $g: GameResultDTO($gameLength: game.lenght, $paramLength: parameters.lenght) from $list
+    then
+    	System.out.println("EVO ME LENGTH: " + $g.getGame().getName() + "broj bodova: " + $g.getPoints());
+        $g.setPoints($g.getPoints()-Math.abs($g.calculate($gameLength) - $g.calculate($paramLength)));
+		update($l);
+end
+
+rule "Price lower than param price"
+	agenda-group "parameters"
+	salience 3
+	lock-on-active
+    when
+   		$l: ListGameResultDTO($list: list) 
+        $g: GameResultDTO(game.price <= parameters.price) from $list
+    then
+    	System.out.println("EVO ME PRICE LOWER: " + $g.getGame().getName() + "broj bodova: " + $g.getPoints());
+        $g.setPoints($g.getPoints()+$g.getPriceScaled());
+        update($l);
+end
+
+rule "Price higher than param price"
+	agenda-group "parameters"
+	salience 3
+	lock-on-active
+    when
+    	$l: ListGameResultDTO($list: list) 
+        $g: GameResultDTO(game.price > parameters.price) from $list
+    then
+    	System.out.println("EVO ME PRICE HIGHER: " + $g.getGame().getName() + "broj bodova: " + $g.getPoints());
+        $g.setPoints($g.getPoints()-$g.getPriceScaled());
+        update($l);
+end
+
+rule "IsOnline"
+	agenda-group "parameters"
+	salience 2
+	lock-on-active
+    when
+   		$l: ListGameResultDTO($list: list) 
+        $g: GameResultDTO(game.isOnline != parameters.isOnline) from $list
+    then
+    	System.out.println("EVO ME PRICE IS ONLINE: " + $g.getGame().getName() + "broj bodova: " + $g.getPoints());
+        $g.setPoints($g.getPoints()+3);
+        update($l);
+end
+
+rule "IsMultiplayer"
+	agenda-group "parameters"
+	salience 1
+	lock-on-active
+    when
+    	$l: ListGameResultDTO($list: list) 
+        $g: GameResultDTO(game.isMultiplayer != parameters.isMultiplayer) from $list
+    then
+    	System.out.println("EVO ME PRICE IS MULTIPLAYER: " + $g.getGame().getName() + "broj bodova: " + $g.getPoints());
+        $g.setPoints($g.getPoints()+3);
+        update($l);
 end
