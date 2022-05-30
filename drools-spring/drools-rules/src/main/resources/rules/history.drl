@@ -1,0 +1,65 @@
+
+package rules;
+import game.helper.model.dto.ListGameResultDTO;
+import game.helper.model.dto.GameResultDTO;
+import game.helper.model.dto.ParametersDTO;
+import game.helper.model.dto.UserHistoryDTO;
+import game.helper.model.enums.Genre;
+import game.helper.model.Game;
+
+rule "GenresHistory"
+	agenda-group "parameters"
+	salience -4
+	lock-on-active
+    when
+    	$l: ListGameResultDTO($list: list) 
+    	$history: UserHistoryDTO($historyGenres: genres) 
+        $g: GameResultDTO($genresGame: game.genres) from $list
+        Genre($historyGenres contains value) from $genresGame
+    then
+    	System.out.println("EVO ME ZANR ISTORIJA: " + $g.getGame().getName() + "broj bodova: " + $g.getPoints());
+        $g.setPoints($g.getPoints()+0.5);
+        update($l);
+end
+
+rule "StudiosHistory"
+	agenda-group "parameters"
+	salience -5
+	lock-on-active
+    when
+    	$l: ListGameResultDTO($list: list) 
+    	$history: UserHistoryDTO($historyStudios: studios) 
+        $g: GameResultDTO($historyStudios contains game.studio.name) from $list
+    then
+    	System.out.println("EVO ME STUDIO ISTORIJA: " + $g.getGame().getName() + "broj bodova: " + $g.getPoints());
+        $g.setPoints($g.getPoints()+1);
+        update($l);
+end
+
+rule "LengthHistory"
+	agenda-group "parameters"
+	salience -6
+	lock-on-active
+    when
+    	$l: ListGameResultDTO($list: list) 
+    	$history: UserHistoryDTO($avgLength: avgLength) 
+        $g: GameResultDTO($avgLength - game.lenght <= 2.5 && $avgLength - game.lenght >= -2.5) from $list
+    then
+    	System.out.println("EVO ME Duzina ISTORIJA: " + $g.getGame().getName() + "broj bodova: " + $g.getPoints());
+        $g.setPoints($g.getPoints()+2);
+        update($l);
+end
+
+rule "PriceHistory"
+	agenda-group "parameters"
+	salience -7
+	lock-on-active
+    when
+    	$l: ListGameResultDTO($list: list) 
+    	$history: UserHistoryDTO($avgPrice: avgPrice) 
+        $g: GameResultDTO($gamePrice: game.price) from $list
+    then
+    	System.out.println("EVO ME CENA ISTORIJA: " + $g.getGame().getName() + "broj bodova: " + $g.getPoints());
+        $g.setPoints($g.getPoints()+3/Math.abs($gamePrice-$avgPrice));
+        update($l);
+end

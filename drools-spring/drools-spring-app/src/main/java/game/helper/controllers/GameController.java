@@ -25,7 +25,7 @@ public class GameController {
 	private GameService gameService;
 
 	@PostMapping("/recommendations/{userId}")
-	public List<TopListDTO> getGame(@PathVariable("userId") String userId,
+	public List<TopListDTO> getGame(@PathVariable("userId") Integer userId,
 			@RequestBody ParametersDTO parametersDto) {
 		
 		return gameService.getRecommendations(parametersDto, userId);

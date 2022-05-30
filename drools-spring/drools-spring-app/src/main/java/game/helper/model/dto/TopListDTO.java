@@ -2,8 +2,8 @@ package game.helper.model.dto;
 
 public class TopListDTO {
 	private String gameName;
-	private int points;
-	public TopListDTO(String gameName, int points) {
+	private double points;
+	public TopListDTO(String gameName, double points) {
 		super();
 		this.gameName = gameName;
 		this.points = points;
@@ -22,10 +22,10 @@ public class TopListDTO {
 	public void setGameName(String gameName) {
 		this.gameName = gameName;
 	}
-	public int getPoints() {
+	public double getPoints() {
 		return points;
 	}
-	public void setPoints(int points) {
+	public void setPoints(double points) {
 		this.points = points;
 	}
 	
