@@ -1,7 +1,10 @@
 INSERT INTO users (username, password, name, lastname) VALUES
 ('user1', 'user1', 'Pera', 'Peric'),
 ('user2', 'user2', 'Mika', 'Mikic'),
-('user3', 'user3', 'Nikola', 'Nikolic');
+('user3', 'user3', 'Nikola', 'Nikolic'),
+('user4', 'user4', 'Mare', 'Maric'),
+('user5', 'user5', 'Rade', 'Radovic'),
+('user6', 'user6', 'Mirko', 'Mirkovic');
 
 INSERT INTO developer_studio (name, address) VALUES
 ('Ubisoft', 'Mite Cenica 56'),
@@ -14,7 +17,6 @@ INSERT INTO game (name, price, lenght, is_multiplayer, is_online, studio_id) VAL
 ('Mass effect', 50, 32.5, TRUE, FALSE, 1),
 ('GTA V', 75, 60, TRUE, TRUE, 3),
 ('Assasins creed', 40.5, 22.5, FALSE, FALSE, 1);
-
 
 INSERT INTO genre (game_id, genre) VALUES
 (1, 'SPORTS'),
@@ -40,4 +42,17 @@ INSERT INTO review (score, created_at, game_id, user_id) VALUES
 (2, '2021-1-3 12:43:33', 2, 3),
 (3, '2021-1-3 12:43:33', 3, 3),
 (4, '2021-1-3 12:43:33', 4, 3),
-(5, '2021-1-3 12:43:33', 5, 3);
+(5, '2021-1-3 12:43:33', 5, 3),
+(5, '2021-1-3 12:43:33', 1, 4),
+(5, '2021-1-3 12:43:33', 2, 4),
+(3, '2021-1-3 12:43:33', 4, 4),
+(5, '2021-1-3 12:43:33', 1, 5),
+(5, '2021-1-3 12:43:33', 2, 5),
+(4, '2021-1-3 12:43:33', 3, 5),
+(3, '2021-1-3 12:43:33', 4, 5),
+(3, '2021-1-3 12:43:33', 5, 5),
+(5, '2021-1-3 12:43:33', 1, 6),
+(4, '2021-1-3 12:43:33', 3, 6),
+(5, '2021-1-3 12:43:33', 5, 6),
+(4, '2021-1-3 12:43:33', 2, 6),
+(3, '2021-1-3 12:43:33', 4, 6);

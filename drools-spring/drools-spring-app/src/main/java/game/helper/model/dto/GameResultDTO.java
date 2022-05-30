@@ -1,10 +1,15 @@
 package game.helper.model.dto;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import game.helper.model.Game;
 
 public class GameResultDTO {
 	private Game game;
 	private int points;
+	private List<String> similarUsers = new ArrayList();
+	
 	public GameResultDTO(Game game) {
 		super();
 		this.game = game;
@@ -25,5 +30,10 @@ public class GameResultDTO {
 	public void setPoints(int points) {
 		this.points = points;
 	}
-	
+	public List<String> getSimilarUsers() {
+		return similarUsers;
+	}
+	public void setSimilarUsers(List<String> similarUsers) {
+		this.similarUsers = similarUsers;
+	}
 }
