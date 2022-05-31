@@ -17,6 +17,12 @@ public class GameResultDTO {
 		this.parameters = parameters;
 	}
 	
+	public GameResultDTO(Game game, double points) {
+		super();
+		this.game = game;
+		this.points = points;
+	}
+	
 	public GameResultDTO() {
 		super();
 	}

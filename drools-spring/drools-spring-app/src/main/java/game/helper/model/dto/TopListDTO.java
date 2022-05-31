@@ -3,10 +3,13 @@ package game.helper.model.dto;
 public class TopListDTO {
 	private String gameName;
 	private double points;
-	public TopListDTO(String gameName, double points) {
+	private int rank;
+	
+	public TopListDTO(String gameName, double points, int rank) {
 		super();
 		this.gameName = gameName;
 		this.points = points;
+		this.rank=rank;
 	}
 	public TopListDTO() {
 		super();
@@ -15,6 +18,7 @@ public class TopListDTO {
 		super();
 		this.gameName = gameDTO.getGame().getName();
 		this.points = gameDTO.getPoints();
+		this.rank = gameDTO.getRank();
 	}
 	public String getGameName() {
 		return gameName;
@@ -27,6 +31,12 @@ public class TopListDTO {
 	}
 	public void setPoints(double points) {
 		this.points = points;
+	}
+	public int getRank() {
+		return rank;
+	}
+	public void setRank(int rank) {
+		this.rank = rank;
 	}
 	
 }	

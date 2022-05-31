@@ -1,0 +1,121 @@
+package rules;
+import game.helper.model.dto.ResultListDTO;
+import game.helper.model.dto.CombiningDTO;
+import game.helper.model.Game;
+
+
+
+rule "FirstFlow5"
+	agenda-group "combining"
+	salience 5
+	lock-on-active
+    when
+    	$rl: ResultListDTO($list: list) 
+        $g: CombiningDTO(rankFirstFlow <= 5) from $list
+    then
+    	System.out.println("EVO ME FIRST FLOW 5: " + $g.getGame().getName());
+    	$g.setEnumFirstFlow(5);
+    	modify($rl){
+    		setList($list);
+    	}
+end
+
+rule "FirstFlow10"
+	agenda-group "combining"
+	salience 5
+	lock-on-active
+    when
+    	ResultListDTO($list: list) 
+        $g: CombiningDTO(rankFirstFlow > 5 && rankFirstFlow <= 10) from $list
+    then
+    	System.out.println("EVO ME FIRST FLOW 10: " + $g.getGame().getName());
+		$g.setEnumFirstFlow(10);
+end
+
+rule "FirstFlow15"
+	agenda-group "combining"
+	salience 5
+	lock-on-active
+    when
+    	ResultListDTO($list: list) 
+        $g: CombiningDTO(rankFirstFlow > 10 && rankFirstFlow <= 15) from $list
+    then
+    	System.out.println("EVO ME FIRST FLOW 10: " + $g.getGame().getName());
+		$g.setEnumFirstFlow(15);
+end
+
+
+rule "SecondFlow5"
+	agenda-group "combining"
+	salience 5
+	lock-on-active
+    when
+    	$rl: ResultListDTO($list: list) 
+        $g: CombiningDTO(rankSecondFlow <= 5) from $list
+    then
+    	System.out.println("EVO ME SECOND FLOW 5: " + $g.getGame().getName());
+    	$g.setEnumSecondFlow(5);
+    	modify($rl){
+    		setList($list);
+    	}
+end
+
+rule "SecondFlow10"
+	agenda-group "combining"
+	salience 5
+	lock-on-active
+    when
+    	ResultListDTO($list: list) 
+        $g: CombiningDTO(rankSecondFlow > 5 && rankSecondFlow <= 10) from $list
+    then
+    	System.out.println("EVO ME SECOND FLOW 10: " + $g.getGame().getName());
+		$g.setEnumSecondFlow(10);
+end
+
+rule "SecondFlow15"
+	agenda-group "combining"
+	salience 5
+	lock-on-active
+    when
+    	ResultListDTO($list: list) 
+        $g: CombiningDTO(rankSecondFlow > 10 && rankSecondFlow <= 15) from $list
+    then
+    	System.out.println("EVO ME SECOND FLOW 15: " + $g.getGame().getName());
+		$g.setEnumSecondFlow(15);
+end
+
+rule "5+5"
+	agenda-group "combining"
+	salience 4
+	lock-on-active
+    when
+    	ResultListDTO($list: list) 
+        $g: CombiningDTO(enumFirstFlow == 5 && enumSecondFlow == 5) from $list
+    then
+    	System.out.println("EVO ME 5+5: " + $g.getGame().getName() + $g.getEnumFirstFlow() + $g.getEnumSecondFlow());
+		//$rl.add($g);
+end
+
+rule "5+10"
+	agenda-group "combining"
+	salience 3
+	lock-on-active
+    when
+    	$r: ResultListDTO($list: list) 
+        $g: CombiningDTO(enumSecondFlow == 5 && enumFirstFlow == 10) from $list
+    then
+    	System.out.println("EVO ME 5+10: " + $g.getGame().getName());
+		$r.addToResult($g);
+end
+
+rule "10+5"
+	agenda-group "combining"
+	salience 3
+	lock-on-active
+    when
+    	$r: ResultListDTO($list: list) 
+        $g: CombiningDTO(enumSecondFlow == 10 && enumFirstFlow == 5) from $list
+    then
+    	System.out.println("EVO ME 5+10: " + $g.getGame().getName());
+		$r.addToResult($g);
+end

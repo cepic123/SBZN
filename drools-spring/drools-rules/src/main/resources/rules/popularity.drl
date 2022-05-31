@@ -24,11 +24,12 @@ rule "Upper"
 	salience -1
 	lock-on-active
     when
-    	ListGameResultDTO($list: list) 
+    	$l:ListGameResultDTO($list: list) 
         $g: GameResultDTO(rank <= $list.size/2) from $list
     then
     	System.out.println("EVO ME SORTIRANO UPPER: " + $g.getGame().getName() + "broj bodova: " + $g.getPoints() +" rank: " + $g.getRank());
 		$g.setUpperOrLower(1);
+		update($l);
 end
 
 rule "Lower"
@@ -36,11 +37,12 @@ rule "Lower"
 	salience -1
 	lock-on-active
     when
-    	ListGameResultDTO($list: list) 
+    	$l: ListGameResultDTO($list: list) 
         $g: GameResultDTO(rank > $list.size/2) from $list
     then
     	System.out.println("EVO ME SORTIRANO LOWER: " + $g.getGame().getName() + "broj bodova: " + $g.getPoints() +" rank: " + $g.getRank());
 		$g.setUpperOrLower(2);
+		update($l);
 end
 
 rule "NumberOfReviews<1"
@@ -48,11 +50,12 @@ rule "NumberOfReviews<1"
 	salience -2
 	lock-on-active
     when
-    	ListGameResultDTO($list: list) 
+    	$l: ListGameResultDTO($list: list) 
         $g: GameResultDTO(game.reviews.size <= 1) from $list
     then
     	System.out.println("EVO ME SORTIRANO NumberOfReviews<1:" + $g.getGame().getName() + "broj bodova: " + $g.getPoints() +" size: " + $g.getGame().getReviews().size());
 		$g.setReviewq(1);
+		update($l);
 end
 
 rule "NumberOfReviews<3"
@@ -60,11 +63,12 @@ rule "NumberOfReviews<3"
 	salience -2
 	lock-on-active
     when
-    	ListGameResultDTO($list: list) 
+    	$l: ListGameResultDTO($list: list) 
         $g: GameResultDTO(game.reviews.size <= 3 && game.reviews.size > 1) from $list
     then
     	System.out.println("EVO ME SORTIRANO NumberOfReviews<3:" + $g.getGame().getName() + "broj bodova: " + $g.getPoints() +" size: " + $g.getGame().getReviews().size());
 		$g.setReviewq(2);
+		update($l);
 end
 
 rule "NumberOfReviews<5"
@@ -72,11 +76,12 @@ rule "NumberOfReviews<5"
 	salience -2
 	lock-on-active
     when
-    	ListGameResultDTO($list: list) 
+    	$l: ListGameResultDTO($list: list) 
         $g: GameResultDTO(game.reviews.size <= 5 && game.reviews.size > 3) from $list
     then
     	System.out.println("EVO ME SORTIRANO NumberOfReviews<5:" + $g.getGame().getName() + "broj bodova: " + $g.getPoints() +" size: " + $g.getGame().getReviews().size());
 		$g.setReviewq(3);
+		update($l);
 end
 
 rule "NumberOfReviews>5"
@@ -84,11 +89,12 @@ rule "NumberOfReviews>5"
 	salience -2
 	lock-on-active
     when
-    	ListGameResultDTO($list: list) 
+    	$l: ListGameResultDTO($list: list) 
         $g: GameResultDTO(game.reviews.size > 5) from $list
     then
     	System.out.println("EVO ME SORTIRANO NumberOfReviews>5:" + $g.getGame().getName() + "broj bodova: " + $g.getPoints() +" size: " + $g.getGame().getReviews().size());
 		$g.setReviewq(4);
+		update($l);
 end
 
 rule "FormulaUpper"
@@ -96,11 +102,12 @@ rule "FormulaUpper"
 	salience -3
 	lock-on-active
     when
-    	ListGameResultDTO($list: list) 
+    	$l: ListGameResultDTO($list: list) 
         $g: GameResultDTO(upperOrLower == 1) from $list
     then
     	System.out.println("EVO ME SORTIRANO FROMULA UPPER:" + $g.getGame().getName() + "broj bodova: " + $g.getPoints() +" size: " + $g.getGame().getReviews().size());
 		$g.setPoints($g.getPoints() +  $g.getReviewq()*$g.getGame().getGrade());
+		update($l);
 end
 
 rule "FormulaLower"
@@ -108,9 +115,11 @@ rule "FormulaLower"
 	salience -3
 	lock-on-active
     when
-    	ListGameResultDTO($list: list) 
+    	$l: ListGameResultDTO($list: list) 
         $g: GameResultDTO(upperOrLower == 2) from $list
     then
     	System.out.println("EVO ME SORTIRANO FROMULA LOWER:" + $g.getGame().getName() + "broj bodova: " + $g.getPoints() +" size: " + $g.getGame().getReviews().size());
 		$g.setPoints($g.getPoints() + ($g.getReviewq()*$g.getGame().getGrade())/2);
+		update($l);
 end
+
