@@ -23,6 +23,7 @@ import game.helper.model.dto.GameMatchDTO;
 import game.helper.model.dto.GameResultDTO;
 import game.helper.model.dto.ListGameResultDTO;
 import game.helper.model.dto.ParametersDTO;
+import game.helper.model.dto.TLDTO;
 import game.helper.model.dto.TopListDTO;
 import game.helper.model.dto.UserMatchDTO;
 import game.helper.model.dto.UserHistoryDTO;
@@ -184,5 +185,32 @@ public class GameService {
 		history.setAvgPrice(sumPrice / user.getReviews().size());
 
 		return history;
+	}
+
+	public List<TopListDTO> getTopList() {
+		KieSession kieSession = kieContainer.newKieSession();
+		
+		List<Game> games = gameRepository.findAll();
+		List<TLDTO> tlDTOS = new ArrayList<TLDTO>();
+		
+		for(Game g: games) {
+			TLDTO tlDTO = new TLDTO();
+			tlDTO.setGame(g);
+			tlDTO.setReviews(g.getReviews());
+			tlDTOS.add(tlDTO);
+			kieSession.insert(tlDTO);	
+		}
+		
+		kieSession.getAgenda().getAgendaGroup("top-list").setFocus();
+		kieSession.fireAllRules();
+		kieSession.dispose();
+		
+		for(TLDTO tlDTO: tlDTOS) {
+			System.out.println("GAME NAME: " + tlDTO.getGame().getName());
+			System.out.println("GAME RATING: " + tlDTO.getRating());
+			System.out.println("REVIEW CATEGORY: " + tlDTO.getReviewCategory());
+			System.out.println("STUDIO RATING: " + tlDTO.getStudioRating());
+		}
+		return null;
 	}
 }
