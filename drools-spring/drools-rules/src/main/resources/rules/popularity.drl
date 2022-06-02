@@ -91,26 +91,42 @@ rule "NumberOfReviews>5"
 		$g.setReviewq(4);
 end
 
-rule "FormulaUpper"
+rule "Calculate Grade"
 	agenda-group "parameters"
 	salience -3
+	lock-on-active
+    when
+    	ListGameResultDTO($list: list) 
+        $g: GameResultDTO() from $list
+        accumulate(
+        	(Review($score: score) from $g.game.reviews),
+        	$grade: average($score)
+        )
+    then
+    	System.out.println("DAJEM GRADE:" + $grade);
+		$g.setGrade($grade);
+end
+
+rule "FormulaUpper"
+	agenda-group "parameters"
+	salience -4
 	lock-on-active
     when
     	ListGameResultDTO($list: list) 
         $g: GameResultDTO(upperOrLower == 1) from $list
     then
     	System.out.println("EVO ME SORTIRANO FROMULA UPPER:" + $g.getGame().getName() + "broj bodova: " + $g.getPoints() +" size: " + $g.getGame().getReviews().size());
-		$g.setPoints($g.getPoints() +  $g.getReviewq()*$g.getGame().getGrade());
+		$g.setPoints($g.getPoints() +  $g.getReviewq()*$g.getGrade());
 end
 
 rule "FormulaLower"
 	agenda-group "parameters"
-	salience -3
+	salience -4
 	lock-on-active
     when
     	ListGameResultDTO($list: list) 
         $g: GameResultDTO(upperOrLower == 2) from $list
     then
     	System.out.println("EVO ME SORTIRANO FROMULA LOWER:" + $g.getGame().getName() + "broj bodova: " + $g.getPoints() +" size: " + $g.getGame().getReviews().size());
-		$g.setPoints($g.getPoints() + ($g.getReviewq()*$g.getGame().getGrade())/2);
+		$g.setPoints($g.getPoints() + ($g.getReviewq()*$g.getGrade())/2);
 end

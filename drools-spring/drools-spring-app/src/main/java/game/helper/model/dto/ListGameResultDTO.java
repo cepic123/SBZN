@@ -4,9 +4,12 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import game.helper.model.enums.RuleStatus;
+
 public class ListGameResultDTO {
 	private List<GameResultDTO> list;
-
+	private RuleStatus status;
+	
 	public ListGameResultDTO(List<GameResultDTO> list) {
 		super();
 		this.list = list;
@@ -33,4 +36,13 @@ public class ListGameResultDTO {
 			list.get(i).setRank(i+1);
 		}
 	}
+
+	public RuleStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(RuleStatus status) {
+		this.status = status;
+	}
+	
 }

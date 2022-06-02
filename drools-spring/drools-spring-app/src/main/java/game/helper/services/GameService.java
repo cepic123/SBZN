@@ -1,7 +1,11 @@
 package game.helper.services;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -17,17 +21,18 @@ import org.springframework.transaction.annotation.Transactional;
 import game.helper.model.Game;
 import game.helper.model.Review;
 import game.helper.model.User;
-
+import game.helper.model.dto.CombiningDTO;
 import game.helper.model.dto.GameMatchDTO;
-
 import game.helper.model.dto.GameResultDTO;
 import game.helper.model.dto.ListGameResultDTO;
 import game.helper.model.dto.ParametersDTO;
+import game.helper.model.dto.ResultListDTO;
 import game.helper.model.dto.TLDTO;
 import game.helper.model.dto.TopListDTO;
 import game.helper.model.dto.UserMatchDTO;
 import game.helper.model.dto.UserHistoryDTO;
 import game.helper.model.enums.Genre;
+import game.helper.model.enums.RuleStatus;
 import game.helper.repository.GameRepo;
 import game.helper.repository.ReviewRepo;
 import game.helper.repository.StudioRepo;
@@ -67,9 +72,68 @@ public class GameService {
 
 		List<GameResultDTO> gamesFromFirstFlow = firstFlow(parametersDto, userId);
 		List<GameResultDTO> gamesFromSecondFlow = secondFlow(userId);
+		ListGameResultDTO list = new ListGameResultDTO(gamesFromSecondFlow);
+		list.sortIt();
+		list.updateRankings();
+		
+		Map<String, CombiningDTO> combinedMap = new HashMap<>();
+		
+		for(GameResultDTO game : gamesFromFirstFlow) {
+			CombiningDTO c = new CombiningDTO();
+			c.setGame(game.getGame());
+			c.setPointsFirstFlow(game.getPoints());
+			c.setRankFirstFlow(game.getRank());
+			combinedMap.put(game.getGame().getName(), c);
+		}
+		
+		for(GameResultDTO game : gamesFromSecondFlow) {
+			if(combinedMap.containsKey(game.getGame().getName())) {
+				CombiningDTO c = combinedMap.get(game.getGame().getName());
+				c.setGame(game.getGame());
+				c.setPointsSecondFlow(game.getPoints());
+				c.setRankSecondFlow(game.getRank());
+				combinedMap.put(game.getGame().getName(), c);
+			}
+			else {
+				CombiningDTO c = new CombiningDTO();
+				c.setGame(game.getGame());
+				c.setPointsSecondFlow(game.getPoints());
+				c.setRankSecondFlow(game.getRank());
+				combinedMap.put(game.getGame().getName(), c);
+			}
+			
+		}
+		
+		List<CombiningDTO> valueList = new ArrayList<>(combinedMap.values());
+		
+		KieSession kieSession = kieContainer.newKieSession();
+		kieSession.getAgenda().getAgendaGroup("combining").setFocus();
+		
+		for(CombiningDTO dto : valueList) {
+			kieSession.insert(dto);
+		}
+		
+		kieSession.fireAllRules();
+		kieSession.dispose();
 
-//		return null;
-		return gamesFromFirstFlow.stream().map(TopListDTO::new).collect(Collectors.toList());
+		ResultListDTO result = new ResultListDTO(valueList);
+		kieSession = kieContainer.newKieSession();
+		kieSession.insert(result);
+		kieSession.getAgenda().getAgendaGroup("combining_enums").setFocus();
+		kieSession.fireAllRules();
+		kieSession.dispose();
+		
+		Collections
+		.sort(result.getList(), Comparator.comparingDouble(CombiningDTO ::getPoints).reversed());
+		kieSession = kieContainer.newKieSession();
+		kieSession.insert(result);
+		kieSession.getAgenda().getAgendaGroup("last_rule").setFocus();
+		kieSession.fireAllRules();
+		kieSession.dispose();
+		
+		Collections
+		.sort(result.getResultList(), Comparator.comparingDouble(CombiningDTO ::getPoints).reversed());
+		return result.getResultList().stream().map(TopListDTO::new).collect(Collectors.toList());
 	}
 
 	private List<GameResultDTO> secondFlow(Integer userId) {
@@ -119,7 +183,10 @@ public class GameService {
 
 		}
 		
-		return null;
+		List<GameResultDTO> gamesDTO = gmDTOS.stream().map(game -> new GameResultDTO(game.getGame(), game.getRating()))
+				.collect(Collectors.toList());
+		
+		return gamesDTO;
 	}
 
 	private List<GameResultDTO> firstFlow(ParametersDTO parametersDto, Integer userId) {
@@ -144,6 +211,7 @@ public class GameService {
 				.collect(Collectors.toList());
 
 		ListGameResultDTO list = new ListGameResultDTO(gamesDTO);
+		list.setStatus(RuleStatus.GENRES);
 		UserHistoryDTO history = extractUserHistory(userId);
 		System.out.println(history);
 
