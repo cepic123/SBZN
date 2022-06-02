@@ -11,7 +11,6 @@ public class CombiningDTO {
 	private int enumFirstFlow;
 	private int enumSecondFlow;
 	
-	
 	public CombiningDTO(Game game, int rankFirstFlow, int rankSecondFlow, double pointsFirstFlow,
 			double pointsSecondFlow) {
 		super();
@@ -66,6 +65,7 @@ public class CombiningDTO {
 	public void setEnumSecondFlow(int enumSecondFlow) {
 		this.enumSecondFlow = enumSecondFlow;
 	}
-	
-	
+	public double getPoints() {
+		return (getPointsFirstFlow()+getPointsSecondFlow())/2;
+	}
 }

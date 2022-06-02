@@ -1,6 +1,8 @@
 package game.helper.services;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -104,35 +106,34 @@ public class GameService {
 		
 		List<CombiningDTO> valueList = new ArrayList<>(combinedMap.values());
 		
-//		for(CombiningDTO dto : valueList) {
-//			System.out.println(dto.getGame().getName());
-//			System.out.println(dto.getPointsFirstFlow());
-//			System.out.println(dto.getPointsSecondFlow());
-//			System.out.println(dto.getRankFirstFlow());
-//			System.out.println(dto.getRankSecondFlow());
-//		}
-		ResultListDTO result = new ResultListDTO(valueList);
-		
 		KieSession kieSession = kieContainer.newKieSession();
-		kieSession.insert(result);
 		kieSession.getAgenda().getAgendaGroup("combining").setFocus();
+		
+		for(CombiningDTO dto : valueList) {
+			kieSession.insert(dto);
+		}
+		
+		kieSession.fireAllRules();
+		kieSession.dispose();
+
+		ResultListDTO result = new ResultListDTO(valueList);
+		kieSession = kieContainer.newKieSession();
+		kieSession.insert(result);
+		kieSession.getAgenda().getAgendaGroup("combining_enums").setFocus();
 		kieSession.fireAllRules();
 		kieSession.dispose();
 		
-//		for(CombiningDTO dto : valueList) {
-//		System.out.println(dto.getGame().getName());
-//		System.out.println(dto.getPointsFirstFlow());
-//		System.out.println(dto.getPointsSecondFlow());
-//		System.out.println(dto.getRankFirstFlow());
-//		System.out.println(dto.getRankSecondFlow());
-//		System.out.println(dto.getEnumFirstFlow());
-//		System.out.println(dto.getEnumSecondFlow());
-//		}
+		Collections
+		.sort(result.getList(), Comparator.comparingDouble(CombiningDTO ::getPoints).reversed());
+		kieSession = kieContainer.newKieSession();
+		kieSession.insert(result);
+		kieSession.getAgenda().getAgendaGroup("last_rule").setFocus();
+		kieSession.fireAllRules();
+		kieSession.dispose();
 		
-//		return null;
-		return gamesFromFirstFlow.stream().map(TopListDTO::new).collect(Collectors.toList());
-//		return gamesFromSecondFlow.stream().map(TopListDTO::new).collect(Collectors.toList());
-
+		Collections
+		.sort(result.getResultList(), Comparator.comparingDouble(CombiningDTO ::getPoints).reversed());
+		return result.getResultList().stream().map(TopListDTO::new).collect(Collectors.toList());
 	}
 
 	private List<GameResultDTO> secondFlow(Integer userId) {

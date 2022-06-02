@@ -137,11 +137,4 @@ public class Game {
 		this.reviews = reviews;
 	}
 	
-	public double getGrade() {
-		Integer sum = 0;
-		for(Review review : this.reviews) {
-			sum += review.getScore();
-		}
-		return sum / (double) this.reviews.size();
-	}
 }
