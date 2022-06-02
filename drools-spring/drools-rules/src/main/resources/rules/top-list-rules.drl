@@ -1,0 +1,137 @@
+import game.helper.model.dto.GameResultDTO;
+import game.helper.model.dto.UserMatchDTO;
+import game.helper.model.dto.GameMatchDTO;
+import game.helper.model.dto.ParametersDTO;
+import game.helper.model.dto.TLDTO;
+import game.helper.model.enums.Genre;
+import game.helper.model.enums.MatchCoeficient;
+import game.helper.model.Game;
+import game.helper.model.Review;
+import game.helper.model.User;
+import java.util.ArrayList;
+import java.util.List;
+
+rule "Top list rule - NUMBER OF REVIEWS 1"
+	agenda-group "top-list"
+	lock-on-active
+	salience 5
+    when    
+    	$tlDTO: TLDTO(reviews.size() <= 1)
+    then
+		$tlDTO.setReviewCategory(1);
+		update($tlDTO);
+end
+
+rule "Top list rule - NUMBER OF REVIEWS 2"
+	agenda-group "top-list"
+	lock-on-active
+	salience 5
+    when    
+    	$tlDTO: TLDTO(reviews.size() > 1 && reviews.size() <= 4)
+    then
+		$tlDTO.setReviewCategory(2);
+		update($tlDTO);
+end
+
+rule "Top list rule - NUMBER OF REVIEWS 3"
+	agenda-group "top-list"
+	lock-on-active
+	salience 5
+    when    
+    	$tlDTO: TLDTO(reviews.size() > 4 && reviews.size() <= 8)
+    then
+		$tlDTO.setReviewCategory(3);
+		update($tlDTO);
+end
+
+rule "Top list rule - NUMBER OF REVIEWS 4"
+	agenda-group "top-list"
+	lock-on-active
+	salience 5
+    when    
+    	$tlDTO: TLDTO(reviews.size() > 8)
+    then
+		$tlDTO.setReviewCategory(4);
+		update($tlDTO);
+end
+
+/////////////////////////
+rule "Top list rule - REVIEW CATEGORY 1"
+	agenda-group "top-list"
+	//lock-on-active
+	salience 4
+    when    
+    	$tlDTO: TLDTO(reviewCategory == 1)
+    then
+		$tlDTO.setRating(0);
+		update($tlDTO);
+end
+
+rule "Top list rule - REVIEW CATEGORY 2"
+	agenda-group "top-list"
+	//lock-on-active
+	salience 4
+    when    
+    	$tlDTO: TLDTO(reviewCategory == 2)
+    then
+		$tlDTO.setRating($tlDTO.getGrade() - 2.5);
+		update($tlDTO);
+end
+
+rule "Top list rule - REVIEW CATEGORY 3"
+	agenda-group "top-list"
+	//lock-on-active
+	salience 4
+    when    
+    	$tlDTO: TLDTO(reviewCategory == 3)
+    then
+		$tlDTO.setRating(($tlDTO.getGrade() - 2.5) * 1.5);
+		update($tlDTO);
+end
+
+rule "Top list rule - REVIEW CATEGORY 4"
+	agenda-group "top-list"
+	//lock-on-active
+	salience 4
+    when    
+    	$tlDTO: TLDTO(reviewCategory == 4)
+    then
+		$tlDTO.setRating(($tlDTO.getGrade() - 2.5) * 3);
+		update($tlDTO);
+end
+
+/////////////////////////
+rule "Top list rule - STUDIO GRADE CALCULATION"
+	agenda-group "top-list"
+	//lock-on-active
+	salience 3
+    when    
+    	$tlDTO: TLDTO()
+    then
+		$tlDTO.setStudioRating($tlDTO.getStudioRating() + $tlDTO.getRating());
+		update($tlDTO);
+end
+
+//////////////////////////
+
+rule "Top list rule - NEGATIVE STUDIO RATING"
+	agenda-group "top-list"
+	//lock-on-active
+	salience 2
+    when    
+    	$tlDTO: TLDTO(studioRating > 0)
+    then
+		$tlDTO.setRating($tlDTO.getRating() * 1.2);
+		update($tlDTO);
+end
+
+rule "Top list rule - POSITIVE STUDIO RATING"
+	agenda-group "top-list"
+	//lock-on-active
+	salience 2
+    when    
+    	$tlDTO: TLDTO(studioRating < 0)
+    then
+		$tlDTO.setRating($tlDTO.getRating() * 0.9);
+		update($tlDTO);
+end

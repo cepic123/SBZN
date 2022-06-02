@@ -30,4 +30,9 @@ public class GameController {
 		
 		return gameService.getRecommendations(parametersDto, userId);
 	}
+	
+	@PostMapping("/topList")
+	public List<TopListDTO> topList() {
+		return gameService.getTopList();
+	}
 }
