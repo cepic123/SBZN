@@ -1,3 +1,8 @@
+template header
+low
+mid
+high
+
 package rules.templates;
 import game.helper.model.*;
 import game.helper.model.enums.*;
@@ -5,50 +10,57 @@ import game.helper.model.dto.*;
 import java.util.ArrayList;
 import java.util.List;
 
+template "top-list"
+
 rule "Top list rule - NUMBER OF REVIEWS 1"
 	agenda-group "top-list"
 	lock-on-active
 	salience 5
     when    
-    	$tlDTO: TLDTO(reviews.size() <= 2)
+    	$tlDTO: TLDTO(reviews.size() <= @{low})
     then
 		$tlDTO.setReviewCategory(1);
 		update($tlDTO);
 end
+
 rule "Top list rule - NUMBER OF REVIEWS 2"
 	agenda-group "top-list"
 	lock-on-active
 	salience 5
     when    
-    	$tlDTO: TLDTO(reviews.size() > 2 && reviews.size() <= 4)
+    	$tlDTO: TLDTO(reviews.size() > @{low} && reviews.size() <= @{mid})
     then
 		$tlDTO.setReviewCategory(2);
 		update($tlDTO);
 end
+
 rule "Top list rule - NUMBER OF REVIEWS 3"
 	agenda-group "top-list"
 	lock-on-active
 	salience 5
     when    
-    	$tlDTO: TLDTO(reviews.size() > 4 && reviews.size() <= 8)
+    	$tlDTO: TLDTO(reviews.size() > @{mid} && reviews.size() <= @{high})
     then
 		$tlDTO.setReviewCategory(3);
 		update($tlDTO);
 end
+
 rule "Top list rule - NUMBER OF REVIEWS 4"
 	agenda-group "top-list"
 	lock-on-active
 	salience 5
     when    
-    	$tlDTO: TLDTO(reviews.size() > 8)
+    	$tlDTO: TLDTO(reviews.size() > @{high})
     then
 		$tlDTO.setReviewCategory(4);
 		update($tlDTO);
 end
 
+
+/////////////////////////
 rule "Top list rule - REVIEW CATEGORY 1"
 	agenda-group "top-list"
-	
+	//lock-on-active
 	salience 4
     when    
     	$tlDTO: TLDTO(reviewCategory == 1)
@@ -56,9 +68,10 @@ rule "Top list rule - REVIEW CATEGORY 1"
 		$tlDTO.setRating(0);
 		update($tlDTO);
 end
+
 rule "Top list rule - REVIEW CATEGORY 2"
 	agenda-group "top-list"
-	
+	//lock-on-active
 	salience 4
     when    
     	$tlDTO: TLDTO(reviewCategory == 2)
@@ -66,9 +79,10 @@ rule "Top list rule - REVIEW CATEGORY 2"
 		$tlDTO.setRating($tlDTO.getGrade() - 2.5);
 		update($tlDTO);
 end
+
 rule "Top list rule - REVIEW CATEGORY 3"
 	agenda-group "top-list"
-	
+	//lock-on-active
 	salience 4
     when    
     	$tlDTO: TLDTO(reviewCategory == 3)
@@ -76,9 +90,10 @@ rule "Top list rule - REVIEW CATEGORY 3"
 		$tlDTO.setRating(($tlDTO.getGrade() - 2.5) * 1.5);
 		update($tlDTO);
 end
+
 rule "Top list rule - REVIEW CATEGORY 4"
 	agenda-group "top-list"
-	
+	//lock-on-active
 	salience 4
     when    
     	$tlDTO: TLDTO(reviewCategory == 4)
@@ -87,9 +102,10 @@ rule "Top list rule - REVIEW CATEGORY 4"
 		update($tlDTO);
 end
 
+/////////////////////////
 rule "Top list rule - STUDIO GRADE CALCULATION"
 	agenda-group "top-list"
-	
+	//lock-on-active
 	salience 3
     when    
     	$tlDTO: TLDTO()
@@ -98,9 +114,11 @@ rule "Top list rule - STUDIO GRADE CALCULATION"
 		update($tlDTO);
 end
 
+//////////////////////////
+
 rule "Top list rule - NEGATIVE STUDIO RATING"
 	agenda-group "top-list"
-	
+	//lock-on-active
 	salience 2
     when    
     	$tlDTO: TLDTO(studioRating > 0)
@@ -108,9 +126,10 @@ rule "Top list rule - NEGATIVE STUDIO RATING"
 		$tlDTO.setRating($tlDTO.getRating() * 1.2);
 		update($tlDTO);
 end
+
 rule "Top list rule - POSITIVE STUDIO RATING"
 	agenda-group "top-list"
-	
+	//lock-on-active
 	salience 2
     when    
     	$tlDTO: TLDTO(studioRating < 0)
@@ -119,4 +138,4 @@ rule "Top list rule - POSITIVE STUDIO RATING"
 		update($tlDTO);
 end
 
-
+end template
