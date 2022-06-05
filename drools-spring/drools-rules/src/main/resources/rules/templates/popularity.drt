@@ -1,7 +1,15 @@
+template header
+low
+mid
+high
+
 package rules.templates;
 import game.helper.model.*;
 import game.helper.model.enums.*;
 import game.helper.model.dto.*;
+
+
+template "popularity"
 
 rule "UpperLowerSort"
 	agenda-group "parameters"
@@ -15,6 +23,7 @@ rule "UpperLowerSort"
         $l.updateRankings();
         update($l);
 end
+
 rule "Upper"
 	agenda-group "parameters"
 	salience -1
@@ -26,6 +35,8 @@ rule "Upper"
     	System.out.println("EVO ME SORTIRANO UPPER: " + $g.getGame().getName() + "broj bodova: " + $g.getPoints() +" rank: " + $g.getRank());
 		$g.setUpperOrLower(1);
 end
+
+
 rule "Lower"
 	agenda-group "parameters"
 	salience -1
@@ -37,50 +48,55 @@ rule "Lower"
     	System.out.println("EVO ME SORTIRANO LOWER: " + $g.getGame().getName() + "broj bodova: " + $g.getPoints() +" rank: " + $g.getRank());
 		$g.setUpperOrLower(2);
 end
+
 rule "NumberOfReviews<Low"
 	agenda-group "parameters"
 	salience -2
 	lock-on-active
     when
     	ListGameResultDTO($list: list) 
-        $g: GameResultDTO(game.reviews.size <= 3) from $list
+        $g: GameResultDTO(game.reviews.size <= @{low}) from $$list
     then
     	System.out.println("EVO ME SORTIRANO NumberOfReviews<Low:" + $g.getGame().getName() + "broj bodova: " + $g.getPoints() +" size: " + $g.getGame().getReviews().size());
 		$g.setReviewq(1);
 end
+
 rule "NumberOfReviews<Mid"
 	agenda-group "parameters"
 	salience -2
 	lock-on-active
     when
     	ListGameResultDTO($list: list) 
-        $g: GameResultDTO(game.reviews.size <= 4 && game.reviews.size > 3) from $list
+        $g: GameResultDTO(game.reviews.size <= @{mid} && game.reviews.size > @{low}) from $$list
     then
     	System.out.println("EVO ME SORTIRANO NumberOfReviews<Mid:" + $g.getGame().getName() + "broj bodova: " + $g.getPoints() +" size: " + $g.getGame().getReviews().size());
 		$g.setReviewq(2);
 end
+
 rule "NumberOfReviews<High"
 	agenda-group "parameters"
 	salience -2
 	lock-on-active
     when
     	ListGameResultDTO($list: list) 
-        $g: GameResultDTO(game.reviews.size <= 6 && game.reviews.size > 4) from $list
+        $g: GameResultDTO(game.reviews.size <= @{high} && game.reviews.size > @{mid}) from $$list
     then
     	System.out.println("EVO ME SORTIRANO NumberOfReviews<High:" + $g.getGame().getName() + "broj bodova: " + $g.getPoints() +" size: " + $g.getGame().getReviews().size());
 		$g.setReviewq(3);
 end
+
 rule "NumberOfReviews>High"
 	agenda-group "parameters"
 	salience -2
 	lock-on-active
     when
     	ListGameResultDTO($list: list) 
-        $g: GameResultDTO(game.reviews.size > 6) from $list
+        $g: GameResultDTO(game.reviews.size > @{high}) from $$list
     then
     	System.out.println("EVO ME SORTIRANO NumberOfReviews>High:" + $g.getGame().getName() + "broj bodova: " + $g.getPoints() +" size: " + $g.getGame().getReviews().size());
 		$g.setReviewq(4);
 end
+
 rule "Calculate Grade"
 	agenda-group "parameters"
 	salience -3
@@ -96,6 +112,7 @@ rule "Calculate Grade"
     	System.out.println("DAJEM GRADE:" + $grade);
 		$g.setGrade($grade);
 end
+
 rule "FormulaUpper"
 	agenda-group "parameters"
 	salience -4
@@ -107,6 +124,7 @@ rule "FormulaUpper"
     	System.out.println("EVO ME SORTIRANO FROMULA UPPER:" + $g.getGame().getName() + "broj bodova: " + $g.getPoints() +" size: " + $g.getGame().getReviews().size());
 		$g.setPoints($g.getPoints() +  $g.getReviewq()*$g.getGrade());
 end
+
 rule "FormulaLower"
 	agenda-group "parameters"
 	salience -4
@@ -119,4 +137,4 @@ rule "FormulaLower"
 		$g.setPoints($g.getPoints() + ($g.getReviewq()*$g.getGrade())/2);
 end
 
-
+end template

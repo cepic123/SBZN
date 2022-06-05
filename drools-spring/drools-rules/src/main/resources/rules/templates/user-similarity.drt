@@ -1,9 +1,16 @@
+template header
+low
+mid
+high
+
 package rules.templates;
 import game.helper.model.*;
 import game.helper.model.enums.*;
 import game.helper.model.dto.*;
 import java.util.ArrayList;
 import java.util.List;
+
+template "user-similarity"
 
 rule "User similarity"
 	agenda-group "users"
@@ -17,35 +24,40 @@ rule "User similarity"
     	$umDTO.setNo_matches($umDTO.getNo_matches() + 1);
         update($umDTO);
 end
+
 rule "User similarity categorisation - LOW"
 	agenda-group "users"
-	
+	//no-loop
 	salience 5
     when    
-        $umDTO: UserMatchDTO(no_matches >= 2 && no_matches < 4)
+        $umDTO: UserMatchDTO(no_matches >= @{low} && no_matches < @{mid})
     then
     	$umDTO.setMatchCoeficient(MatchCoeficient.USER_LOW_MATCH);
         update($umDTO);
 end
+
 rule "User similarity categorisation - MID"
 	agenda-group "users"
-	
+	//no-loop
 	salience 5
     when    
-        $umDTO: UserMatchDTO(no_matches >= 4 && no_matches < 7)
+        $umDTO: UserMatchDTO(no_matches >= @{mid} && no_matches < @{high})
+		
     then
        	$umDTO.setMatchCoeficient(MatchCoeficient.USER_MID_MATCH);
         update($umDTO);
 end
+
 rule "User similarity categorisation - HIGH"
 	agenda-group "users"
-	
+	//no-loop
 	salience 5
     when    
-        $umDTO: UserMatchDTO(no_matches >= 7)
+        $umDTO: UserMatchDTO(no_matches >= @{high})
+		
     then
     	$umDTO.setMatchCoeficient(MatchCoeficient.USER_HIGH_MATCH);
         update($umDTO);
 end
 
-
+end template

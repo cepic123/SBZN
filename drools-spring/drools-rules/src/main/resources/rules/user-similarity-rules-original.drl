@@ -1,0 +1,72 @@
+package rules;
+
+import game.helper.model.dto.GameResultDTO;
+import game.helper.model.dto.UserMatchDTO;
+import game.helper.model.dto.ParametersDTO;
+import game.helper.model.enums.Genre;
+import game.helper.model.enums.MatchCoeficient;
+import game.helper.model.Game;
+import game.helper.model.Review;
+import game.helper.model.User;
+import java.util.ArrayList;
+import java.util.List;
+
+rule "User similarity"
+	agenda-group "users"
+	lock-on-active
+	salience 10
+    when    
+        $umDTO: UserMatchDTO($u: user, $reviews: reviews, $user_reviews: user.reviews)
+        $r: Review($game: game) from $reviews
+        
+        $match: Review(game == $game) from $user_reviews
+        
+        //$u: User($user_reviews: reviews)
+        //$r: Review($game: game)
+        //$match: Review(game == $game) from $user_reviews
+        
+    then
+    	//System.out.println($u.getUsername());
+    	//System.out.println($r.getUser().getUsername());
+    	//System.out.println($user_reviews.size());
+
+    	$umDTO.setNo_matches($umDTO.getNo_matches() + 1);
+    	//$umDTO.setOtherUser($r.getUser());
+    	//insert($game);
+        update($umDTO);
+end
+
+rule "User similarity categorisation - LOW"
+	agenda-group "users"
+	//no-loop
+	salience 5
+    when    
+        $umDTO: UserMatchDTO(no_matches >= 1 && no_matches < 3)
+    then
+    	$umDTO.setMatchCoeficient(MatchCoeficient.USER_LOW_MATCH);
+        update($umDTO);
+end
+
+rule "User similarity categorisation - MID"
+	agenda-group "users"
+	//no-loop
+	salience 5
+    when    
+        $umDTO: UserMatchDTO(no_matches >= 3 && no_matches < 5)
+		
+    then
+       	$umDTO.setMatchCoeficient(MatchCoeficient.USER_MID_MATCH);
+        update($umDTO);
+end
+
+rule "User similarity categorisation - HIGH"
+	agenda-group "users"
+	//no-loop
+	salience 5
+    when    
+        $umDTO: UserMatchDTO(no_matches >= 5)
+		
+    then
+    	$umDTO.setMatchCoeficient(MatchCoeficient.USER_HIGH_MATCH);
+        update($umDTO);
+end
