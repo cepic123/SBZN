@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import game.helper.model.Game;
+import game.helper.model.dto.GameDTO;
 import game.helper.model.dto.GameResultDTO;
 import game.helper.model.dto.ParametersDTO;
+import game.helper.model.dto.ReviewDTO;
 import game.helper.model.dto.TopListDTO;
 import game.helper.model.enums.Genre;
 import game.helper.services.GameService;
@@ -34,5 +36,10 @@ public class GameController {
 	@PostMapping("/topList")
 	public List<TopListDTO> topList() {
 		return gameService.getTopList();
+	}
+	
+	@PostMapping("/save")
+	public String save(@RequestBody GameDTO gameDTO) {
+		return gameService.save(gameDTO);
 	}
 }
