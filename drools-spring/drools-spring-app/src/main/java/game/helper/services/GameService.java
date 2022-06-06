@@ -3,9 +3,11 @@ package game.helper.services;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -22,6 +24,7 @@ import game.helper.model.Game;
 import game.helper.model.Review;
 import game.helper.model.User;
 import game.helper.model.dto.CombiningDTO;
+import game.helper.model.dto.GameDTO;
 import game.helper.model.dto.GameMatchDTO;
 import game.helper.model.dto.GameResultDTO;
 import game.helper.model.dto.ListGameResultDTO;
@@ -33,6 +36,8 @@ import game.helper.model.dto.UserMatchDTO;
 import game.helper.model.dto.UserHistoryDTO;
 import game.helper.model.enums.Genre;
 import game.helper.model.enums.RuleStatus;
+import game.helper.model.events.GameEvent;
+import game.helper.model.events.ReviewEvent;
 import game.helper.repository.GameRepo;
 import game.helper.repository.ReviewRepo;
 import game.helper.repository.StudioRepo;
@@ -280,5 +285,25 @@ public class GameService {
 			System.out.println("STUDIO RATING: " + tlDTO.getStudioRating());
 		}
 		return null;
+	}
+	
+	public String save(GameDTO gameInfo) throws NoSuchElementException {
+		Game g = new Game();
+		g.setName(gameInfo.getName());
+		g.setLenght(gameInfo.getLenght());
+		g.setStudio(studioRepository.findById(gameInfo.getStudioId()).get());
+		g.setPrice(gameInfo.getPrice());
+		g.setMultiplayer(gameInfo.isMultiplayer());
+		g.setOnline(gameInfo.isOnline());
+		g.setGenre(gameInfo.getGenres());
+		
+		gameRepository.save(g);
+
+		KieSession kieSession = kieContainer.newKieSession();
+		kieSession.insert(new GameEvent(g));
+		kieSession.insert(reviewRepository.findAll());
+		kieSession.fireAllRules();
+		kieSession.dispose();
+		return "Success";
 	}
 }

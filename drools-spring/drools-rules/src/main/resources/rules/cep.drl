@@ -1,0 +1,147 @@
+package rules;
+import game.helper.model.events.ReviewEvent;
+import game.helper.model.events.GameEvent;
+import game.helper.model.Game;
+import game.helper.model.Review;
+
+declare NoReviewsEvent
+    @role(event)
+    message: String
+end
+
+declare LastCalculationEvent
+    @role(event)
+    message: String
+end
+
+declare NoReviewsSingleGameEvent
+    @role(event)
+    message: String
+    gameId: Integer
+end
+
+declare NewGameEvent
+    @role(event)
+    message: String
+    gameId: Integer
+end
+
+declare FirstEvent
+    @role(event)
+    message: String
+end
+
+declare SecondEvent
+    @role(event)
+    message: String
+end
+
+declare Counter
+	count: double
+end
+
+rule "More than 10 reviews in the system"
+    when
+    	$re1: ReviewEvent($r1: review)
+    	$counter: Counter() from accumulate(
+            $re2: ReviewEvent(
+	            this != $re1, 
+            	this meets[1h] $re1
+            ),
+           	init
+			(
+				Counter c = new Counter();
+				c.setCount(1.0);
+			),
+			action
+			(
+				c.setCount(c.getCount() + 1);
+			),
+			result
+			(
+				c
+			)
+        )
+        eval($counter.getCount() > 9)
+        not (NoReviewsEvent(message == "Ten new reviews in system"))
+    then
+        insert(new NoReviewsEvent("Ten new reviews in system"));
+        System.out.println("NEW REVIEW IN SYSTEM: " + $counter.getCount());
+end
+
+rule "More than 5 reviews on the same game"
+    when
+    	$re1: ReviewEvent($r1: review)
+    	$counter: Counter() from accumulate(
+            $re2: ReviewEvent(
+	            this != $re1, 
+            	this.review.game.id == $r1.game.id,
+            	this meets[1h] $re1
+            ),
+           	init
+			(
+				Counter c = new Counter();
+				c.setCount(1.0);
+			),
+			action
+			(
+				c.setCount(c.getCount() + 1);
+			),
+			result
+			(
+				c
+			)
+        )
+        eval($counter.getCount() > 4)
+        //not (NoReviewsSingleGameEvent(count == 5, message == "Five new reviews on game", gameId == $r1.game.id))
+        not (NoReviewsSingleGameEvent(message == "Five new reviews on game", gameId == $r1.game.id))
+    then
+        //insert(new NoReviewsSingleGameEvent($counter.getCount(), "Five new reviews on game", $r1.getGame().getId()));
+        insert(new NoReviewsSingleGameEvent("Five new reviews on game", $r1.getGame().getId()));
+        System.out.println("NEW REVIEW IN SYSTEM ON SAME GAME: " + $counter.getCount());
+end
+
+rule "New game in system"
+    when
+    	$g: GameEvent($game: game)
+        not (NewGameEvent(message == "New game added to the system", gameId == $game.id))
+    then
+        insert(new NewGameEvent("New game added to the system", $game.getId()));
+        System.out.println("NEW GAME IN SYSTEM: " + $game.getName());
+end
+
+rule "TODO: TIME FROM LAST TOP LIST CALCULATION"
+    when
+    	not (LastCalculationEvent(message == "Last top list calculation was 5 hours ago"))
+    then
+        insert(new LastCalculationEvent("Last top list calculation was 5 hours ago"));
+        System.out.println("Last top list calculation was 5 hours ago");
+end
+
+rule "First two conditions met"
+    when
+    	NewGameEvent()
+        NoReviewsSingleGameEvent()
+        not (FirstEvent(message == "First condition met"))
+    then
+        insert(new FirstEvent("First condition met"));
+        System.out.println("FIRST DONE" );
+end
+
+rule "Second two conditions met"
+    when
+    	LastCalculationEvent()
+        NoReviewsEvent()
+        not (SecondEvent(message == "Second condition met"))
+    then
+        insert(new SecondEvent("Second condition met"));
+        System.out.println("SECOND DONE" );
+end
+
+rule "CALCULATE TOP LIST!"
+    when
+    	SecondEvent()
+        FirstEvent()        
+    then
+        System.out.println("CALCULATE TOP LIST" );
+end
