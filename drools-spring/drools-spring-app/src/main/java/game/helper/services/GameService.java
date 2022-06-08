@@ -128,17 +128,35 @@ public class GameService {
 		kieSession.fireAllRules();
 		kieSession.dispose();
 		
-		Collections
-		.sort(result.getList(), Comparator.comparingDouble(CombiningDTO ::getPoints).reversed());
+		List<CombiningDTO> resultList = new ArrayList<>();
+		kieSession = kieContainer.newKieSession();
+		kieSession.getAgenda().getAgendaGroup("sort").setFocus();
+		kieSession.setGlobal("resultList", resultList);
+		for(CombiningDTO dto : result.getList()) {
+			kieSession.insert(dto);
+		}
+		kieSession.fireAllRules();
+		kieSession.dispose();
+		
+		result.setList(resultList);
+		
 		kieSession = kieContainer.newKieSession();
 		kieSession.insert(result);
 		kieSession.getAgenda().getAgendaGroup("last_rule").setFocus();
 		kieSession.fireAllRules();
 		kieSession.dispose();
 		
-		Collections
-		.sort(result.getResultList(), Comparator.comparingDouble(CombiningDTO ::getPoints).reversed());
-		return result.getResultList().stream().map(TopListDTO::new).collect(Collectors.toList());
+		List<CombiningDTO> resultListFinal = new ArrayList<>();
+		kieSession = kieContainer.newKieSession();
+		kieSession.getAgenda().getAgendaGroup("sort").setFocus();
+		kieSession.setGlobal("resultList", resultListFinal);
+		for(CombiningDTO dto : result.getResultList()) {
+			kieSession.insert(dto);
+		}
+		kieSession.fireAllRules();
+		kieSession.dispose();
+		
+		return resultListFinal.stream().map(TopListDTO::new).collect(Collectors.toList());
 	}
 
 	private List<GameResultDTO> secondFlow(Integer userId) {

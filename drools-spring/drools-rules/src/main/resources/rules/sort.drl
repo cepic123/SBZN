@@ -1,0 +1,17 @@
+package rules.templates;
+import game.helper.model.*;
+import game.helper.model.enums.*;
+import game.helper.model.dto.*;
+
+global java.util.List resultList;
+
+
+rule "Using a global"
+	agenda-group "sort"
+	salience $first + $second
+	when
+	    $dto: CombiningDTO($first: pointsFirstFlow, $second: pointsSecondFlow)
+	then
+	    resultList.add($dto);
+	    System.out.println("EVO ME U SORTU PRAVILO" + $first + $second);
+end
