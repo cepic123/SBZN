@@ -1,0 +1,23 @@
+<mat-toolbar color="primary">
+  <span>Game Helper</span>
+
+  <!-- This fills the remaining space of the current row -->
+  <span class="example-fill-remaining-space"></span>
+
+  <mat-button-toggle-group #group="matButtonToggleGroup">
+    <mat-button-toggle
+      value="left"
+      style="font-size: 15px"
+      (click)="routeTo('recommendations')"
+    >
+      Recommendations
+    </mat-button-toggle>
+    <mat-button-toggle
+      value="right"
+      style="font-size: 15px"
+      (click)="routeTo('templates')"
+    >
+      Templates
+    </mat-button-toggle>
+  </mat-button-toggle-group>
+</mat-toolbar>
