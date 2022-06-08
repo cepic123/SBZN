@@ -3,13 +3,11 @@ package game.helper.services;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.HashSet;
 import java.util.Set;
@@ -37,19 +35,17 @@ import game.helper.model.dto.UserHistoryDTO;
 import game.helper.model.enums.Genre;
 import game.helper.model.enums.RuleStatus;
 import game.helper.model.events.GameEvent;
-import game.helper.model.events.ReviewEvent;
 import game.helper.repository.GameRepo;
 import game.helper.repository.ReviewRepo;
 import game.helper.repository.StudioRepo;
 import game.helper.repository.UserRepo;
-
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
 public class GameService {
 
 	private final KieContainer kieContainer;
+	private final KieSession kieSession;
 	private final GameRepo gameRepository;
 	private final UserRepo userRepository;
 	private final StudioRepo studioRepository;
@@ -57,12 +53,13 @@ public class GameService {
 
 	@Autowired
 	public GameService(KieContainer kieContainer, GameRepo gameRepository, UserRepo userRepository,
-			StudioRepo studioRepository, ReviewRepo reviewRepository) {
+			StudioRepo studioRepository, ReviewRepo reviewRepository, KieSession kieSession) {
 		this.kieContainer = kieContainer;
 		this.gameRepository = gameRepository;
 		this.userRepository = userRepository;
 		this.studioRepository = studioRepository;
 		this.reviewRepository = reviewRepository;
+		this.kieSession = kieSession;
 	}
 
 	public Game getGame(Game g) {
@@ -257,8 +254,8 @@ public class GameService {
 
 		double sumPrice = 0;
 		double sumLength = 0;
-		Set<Genre> genres = new HashSet();
-		Set<String> studios = new HashSet();
+		Set<Genre> genres = new HashSet<Genre>();
+		Set<String> studios = new HashSet<String>();
 
 		for (Review review : user.getReviews()) {
 			genres.addAll(review.getGame().getGenres());
@@ -317,11 +314,8 @@ public class GameService {
 		
 		gameRepository.save(g);
 
-		KieSession kieSession = kieContainer.newKieSession();
 		kieSession.insert(new GameEvent(g));
-		kieSession.insert(reviewRepository.findAll());
-		kieSession.fireAllRules();
-		kieSession.dispose();
+		System.out.println(kieSession.fireAllRules());
 		return "Success";
 	}
 }

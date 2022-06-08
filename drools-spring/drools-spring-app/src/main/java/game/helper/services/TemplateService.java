@@ -1,10 +1,8 @@
 package game.helper.services;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,8 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
-import game.helper.model.Game;
 import game.helper.model.dto.PopularityTemplateDTO;
 import game.helper.repository.GameRepo;
 import game.helper.repository.ReviewRepo;
@@ -100,6 +96,4 @@ public class TemplateService {
 
         invoker.execute(request);
     }
-	
-	
 }
