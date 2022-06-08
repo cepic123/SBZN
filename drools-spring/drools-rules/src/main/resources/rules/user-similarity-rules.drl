@@ -22,7 +22,7 @@ rule "User similarity categorisation - LOW"
 	
 	salience 5
     when    
-        $umDTO: UserMatchDTO(no_matches >= 2 && no_matches < 4)
+        $umDTO: UserMatchDTO(no_matches >= 1 && no_matches < 2)
     then
     	$umDTO.setMatchCoeficient(MatchCoeficient.USER_LOW_MATCH);
         update($umDTO);
@@ -32,7 +32,7 @@ rule "User similarity categorisation - MID"
 	
 	salience 5
     when    
-        $umDTO: UserMatchDTO(no_matches >= 4 && no_matches < 7)
+        $umDTO: UserMatchDTO(no_matches >= 2 && no_matches < 5)
     then
        	$umDTO.setMatchCoeficient(MatchCoeficient.USER_MID_MATCH);
         update($umDTO);
@@ -42,7 +42,7 @@ rule "User similarity categorisation - HIGH"
 	
 	salience 5
     when    
-        $umDTO: UserMatchDTO(no_matches >= 7)
+        $umDTO: UserMatchDTO(no_matches >= 5)
     then
     	$umDTO.setMatchCoeficient(MatchCoeficient.USER_HIGH_MATCH);
         update($umDTO);

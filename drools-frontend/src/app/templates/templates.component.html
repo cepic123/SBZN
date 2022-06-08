@@ -1,0 +1,30 @@
+<mat-form-field class="example-full-width" appearance="fill">
+  <mat-label>Low</mat-label>
+  <input matInput type="number" [(ngModel)]="low" />
+</mat-form-field>
+<mat-form-field class="example-full-width" appearance="fill">
+  <mat-label>Mid</mat-label>
+  <input matInput type="number" [(ngModel)]="mid" />
+</mat-form-field>
+<mat-form-field class="example-full-width" appearance="fill">
+  <mat-label>High</mat-label>
+  <input matInput type="number" [(ngModel)]="high" />
+</mat-form-field>
+
+<mat-radio-group aria-label="Template" [(ngModel)]="path">
+  <mat-label>Select template: </mat-label>
+
+  <mat-radio-button value="Popularity">Popularity</mat-radio-button>
+  <mat-radio-button value="UserSimilarity">User Similarity</mat-radio-button>
+  <mat-radio-button value="TopList">Top List</mat-radio-button>
+</mat-radio-group>
+
+<button
+  id="basic"
+  type="button"
+  mat-button
+  (click)="generateTemplate()"
+  color="primary"
+>
+  Generate template
+</button>

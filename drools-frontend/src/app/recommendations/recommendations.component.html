@@ -1,0 +1,72 @@
+<div>
+  <mat-form-field appearance="fill">
+    <mat-label>Genres</mat-label>
+    <mat-select placeholder="Genres" [(value)]="selectedGenres" multiple>
+      <mat-option *ngFor="let genre of genreList" [value]="genre">{{
+        genre
+      }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Studios</mat-label>
+    <mat-select placeholder="Studios" [(value)]="selectedStudios" multiple>
+      <mat-option *ngFor="let studio of studioList" [value]="studio">{{
+        studio
+      }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field class="example-full-width" appearance="fill">
+    <mat-label>Price</mat-label>
+    <input matInput type="number" [(ngModel)]="price" />
+  </mat-form-field>
+
+  <mat-form-field class="example-full-width" appearance="fill">
+    <mat-label>Length</mat-label>
+    <input matInput type="number" [(ngModel)]="length" />
+  </mat-form-field>
+
+  <mat-radio-group aria-label="Is multiplayer" [(ngModel)]="isMultiplayer">
+    <mat-label>Is multiplayer: </mat-label>
+
+    <mat-radio-button value="true">True</mat-radio-button>
+    <mat-radio-button value="false">False</mat-radio-button>
+  </mat-radio-group>
+  <mat-radio-group aria-label="Is online" [(ngModel)]="isOnline">
+    <mat-label>Is online: </mat-label>
+
+    <mat-radio-button value="true">True</mat-radio-button>
+    <mat-radio-button value="false">False</mat-radio-button>
+  </mat-radio-group>
+
+  <button
+    id="basic"
+    type="button"
+    mat-button
+    (click)="getRecommendations()"
+    color="primary"
+  >
+    Get recommendations
+  </button>
+
+  <table
+    mat-table
+    [dataSource]="recommendations"
+    class="mat-elevation-z8"
+    *ngIf="recommendations.length > 0"
+  >
+    <ng-container matColumnDef="Name">
+      <th mat-header-cell *matHeaderCellDef>Name</th>
+      <td mat-cell *matCellDef="let element">{{ element.gameName }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="Points">
+      <th mat-header-cell *matHeaderCellDef>Points</th>
+      <td mat-cell *matCellDef="let element">{{ element.points }}</td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+</div>
