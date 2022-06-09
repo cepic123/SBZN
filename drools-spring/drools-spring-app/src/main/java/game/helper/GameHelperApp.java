@@ -3,6 +3,7 @@ package game.helper;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieScanner;
 import org.kie.api.runtime.KieContainer;
+import org.kie.api.runtime.KieSession;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
@@ -23,5 +24,12 @@ public class GameHelperApp {
 		KieScanner kScanner = ks.newKieScanner(kContainer);
 		kScanner.start(100_000);
 		return kContainer;
-	} 
+	}
+	
+	@Bean
+	public KieSession kieSession() {
+    	KieServices ks = KieServices.Factory.get();
+    	KieContainer kc = ks.newKieClasspathContainer();
+        return kc.newKieSession("cepKsession");
+	}
 }
