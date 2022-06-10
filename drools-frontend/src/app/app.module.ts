@@ -7,7 +7,7 @@ import { NavbarComponent } from './navbar/navbar.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { MatTableModule } from '@angular/material/table';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
@@ -16,8 +16,20 @@ import { MatRadioModule } from '@angular/material/radio';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { TemplatesComponent } from './templates/templates.component';
+import { RegistrationComponent } from './registration/registration.component';
+import { LoginComponent } from './login/login.component';
+import { LogoutComponent } from './logout/logout.component';
+import { TokenInterceptor } from './token.interceptor';
 @NgModule({
-  declarations: [AppComponent, RecommendationsComponent, NavbarComponent, TemplatesComponent],
+  declarations: [
+    AppComponent,
+    RecommendationsComponent,
+    NavbarComponent,
+    TemplatesComponent,
+    RegistrationComponent,
+    LoginComponent,
+    LogoutComponent,
+  ],
   imports: [
     MatToolbarModule,
     BrowserModule,
@@ -34,7 +46,13 @@ import { TemplatesComponent } from './templates/templates.component';
     ReactiveFormsModule,
     FormsModule,
   ],
-  providers: [],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: TokenInterceptor,
+      multi: true,
+    },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

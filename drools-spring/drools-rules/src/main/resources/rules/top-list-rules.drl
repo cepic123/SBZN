@@ -10,7 +10,7 @@ rule "Top list rule - NUMBER OF REVIEWS 1"
 	lock-on-active
 	salience 5
     when    
-    	$tlDTO: TLDTO(reviews.size() <= 2)
+    	$tlDTO: TLDTO(reviews.size() <= 3)
     then
 		$tlDTO.setReviewCategory(1);
 		update($tlDTO);
@@ -20,7 +20,7 @@ rule "Top list rule - NUMBER OF REVIEWS 2"
 	lock-on-active
 	salience 5
     when    
-    	$tlDTO: TLDTO(reviews.size() > 2 && reviews.size() <= 4)
+    	$tlDTO: TLDTO(reviews.size() > 3 && reviews.size() <= 5)
     then
 		$tlDTO.setReviewCategory(2);
 		update($tlDTO);
@@ -30,7 +30,7 @@ rule "Top list rule - NUMBER OF REVIEWS 3"
 	lock-on-active
 	salience 5
     when    
-    	$tlDTO: TLDTO(reviews.size() > 4 && reviews.size() <= 8)
+    	$tlDTO: TLDTO(reviews.size() > 5 && reviews.size() <= 9)
     then
 		$tlDTO.setReviewCategory(3);
 		update($tlDTO);
@@ -40,7 +40,7 @@ rule "Top list rule - NUMBER OF REVIEWS 4"
 	lock-on-active
 	salience 5
     when    
-    	$tlDTO: TLDTO(reviews.size() > 8)
+    	$tlDTO: TLDTO(reviews.size() > 9)
     then
 		$tlDTO.setReviewCategory(4);
 		update($tlDTO);
