@@ -1,10 +1,10 @@
-INSERT INTO users (username, password, name, lastname) VALUES
-('user1', 'user1', 'Pera', 'Peric'),
-('user2', 'user2', 'Mika', 'Mikic'),
-('user3', 'user3', 'Nikola', 'Nikolic'),
-('user4', 'user4', 'Mare', 'Maric'),
-('user5', 'user5', 'Rade', 'Radovic'),
-('user6', 'user6', 'Mirko', 'Mirkovic');
+INSERT INTO users (username, password, name, lastname, role) VALUES
+('user1', '$2a$12$CjNE/X6ZrhrUPwAZTF9heO/HblYD6FY1/m9C6wk1WADgg23yelG2m', 'Pera', 'Peric', 'USER'),
+('user2', 'user2', 'Mika', 'Mikic', 'USER'),
+('user3', 'user3', 'Nikola', 'Nikolic', 'USER'),
+('user4', 'user4', 'Mare', 'Maric', 'USER'),
+('user5', 'user5', 'Rade', 'Radovic', 'USER'),
+('user6', 'user6', 'Mirko', 'Mirkovic', 'USER');
 
 INSERT INTO developer_studio (name, address) VALUES
 ('Ubisoft', 'Mite Cenica 56'),

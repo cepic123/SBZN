@@ -5,12 +5,17 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import game.helper.model.enums.Genre;
+import game.helper.model.enums.Role;
 @Entity
 @Table(name = "users")
 public class User {
@@ -27,6 +32,9 @@ public class User {
 	private String lastname;
 	@OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
 	private List<Review> reviews = new ArrayList<>();
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false, name = "role")
+	private Role role;
 	
 	public User(String username, String password, String name, String lastname) {
 		super();
@@ -34,6 +42,7 @@ public class User {
 		this.password = password;
 		this.name = name;
 		this.lastname = lastname;
+		this.role = Role.USER;
 	}
 
 	public User() {
@@ -87,4 +96,13 @@ public class User {
 	public void setReviews(List<Review> reviews) {
 		this.reviews = reviews;
 	}
+
+	public Role getRole() {
+		return role;
+	}
+
+	public void setRole(Role role) {
+		this.role = role;
+	}
+	
 }
