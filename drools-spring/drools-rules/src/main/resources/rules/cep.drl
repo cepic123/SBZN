@@ -110,12 +110,11 @@ rule "New game in system"
         System.out.println("NEW GAME IN SYSTEM: " + $game.getName());
 end
 
-rule "TODO: TIME FROM LAST TOP LIST CALCULATION"
+rule "TIME FROM LAST TOP LIST CALCULATION"
     when
     	not (LastCalculationEvent(message == "Last top list calculation was 5 hours ago"))
     then
         insert(new LastCalculationEvent("Last top list calculation was 5 hours ago"));
-        System.out.println("Last top list calculation was 5 hours ago");
 end
 
 rule "First two conditions met"

@@ -20,6 +20,8 @@ import { RegistrationComponent } from './registration/registration.component';
 import { LoginComponent } from './login/login.component';
 import { LogoutComponent } from './logout/logout.component';
 import { TokenInterceptor } from './token.interceptor';
+import { TopListComponent } from './top-list/top-list.component';
+import { CreateGameComponent } from './create-game/create-game.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -29,6 +31,8 @@ import { TokenInterceptor } from './token.interceptor';
     RegistrationComponent,
     LoginComponent,
     LogoutComponent,
+    TopListComponent,
+    CreateGameComponent
   ],
   imports: [
     MatToolbarModule,

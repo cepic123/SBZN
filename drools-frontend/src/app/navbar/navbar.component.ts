@@ -36,6 +36,8 @@ export class NavbarComponent implements OnInit {
       { name: 'Logout', route: 'logout' },
       { name: 'Templates', route: 'templates' },
       { name: 'Recommendations', route: 'recommendations' },
+      { name: 'Top List', route: 'top-list' },
+      { name: 'Create Game', route: 'create-game' },
     ];
   }
 
@@ -46,5 +48,12 @@ export class NavbarComponent implements OnInit {
     ];
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    if(sessionStorage.getItem("isLoggedIn") === "true") {
+      this.setNavbarItems()
+    }
+    else {
+      this.setLogoutItems()
+    }
+  }
 }

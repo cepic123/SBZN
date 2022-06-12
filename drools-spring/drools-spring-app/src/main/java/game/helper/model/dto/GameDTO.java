@@ -7,17 +7,17 @@ import game.helper.model.enums.Genre;
 public class GameDTO {
 	private String name;
 	private List<Genre> genres;
-	private Integer studioId;
+	private String studioName;
 	private double price;
 	private double lenght;
 	private boolean isMultiplayer;
 	private boolean isOnline;
-	public GameDTO(String name, List<Genre> genres, Integer studioId, double price, double lenght,
+	public GameDTO(String name, List<Genre> genres, String studioName, double price, double lenght,
 			boolean isMultiplayer, boolean isOnline) {
 		super();
 		this.name = name;
 		this.genres = genres;
-		this.studioId = studioId;
+		this.studioName = studioName;
 		this.price = price;
 		this.lenght = lenght;
 		this.isMultiplayer = isMultiplayer;
@@ -38,11 +38,11 @@ public class GameDTO {
 	public void setGenres(List<Genre> genres) {
 		this.genres = genres;
 	}
-	public Integer getStudioId() {
-		return studioId;
+	public String getStudioName() {
+		return studioName;
 	}
-	public void setStudioId(Integer studioId) {
-		this.studioId = studioId;
+	public void setStudioName(String studioName) {
+		this.studioName = studioName;
 	}
 	public double getPrice() {
 		return price;

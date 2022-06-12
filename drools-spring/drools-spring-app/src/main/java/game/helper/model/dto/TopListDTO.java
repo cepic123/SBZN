@@ -4,7 +4,7 @@ public class TopListDTO {
 	private String gameName;
 	private double points;
 	
-	public TopListDTO(String gameName, double points, int rank) {
+	public TopListDTO(String gameName, double points) {
 		super();
 		this.gameName = gameName;
 		this.points = points;
@@ -34,6 +34,4 @@ public class TopListDTO {
 	public void setPoints(double points) {
 		this.points = points;
 	}
-	
-	
 }	

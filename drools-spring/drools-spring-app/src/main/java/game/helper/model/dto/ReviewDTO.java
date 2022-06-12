@@ -1,29 +1,29 @@
 package game.helper.model.dto;
 
 public class ReviewDTO {
-	private Integer userId;
-	private Integer gameId;
-	private Integer score;
-	public ReviewDTO(Integer userId, Integer gameId, Integer score) {
+		private String userName;
+		private String gameName;
+		private Integer score;
+	public ReviewDTO(String userName, String gameName, Integer score) {
 		super();
-		this.userId = userId;
-		this.gameId = gameId;
+		this.userName = userName;
+		this.gameName = gameName;
 		this.score = score;
 	}
 	public ReviewDTO() {
 		super();
 	}
-	public Integer getUserId() {
-		return userId;
+	public String getUserName() {
+		return userName;
 	}
-	public void setUserId(Integer userId) {
-		this.userId = userId;
+	public void setUserName(String userName) {
+		this.userName = userName;
 	}
-	public Integer getGameId() {
-		return gameId;
+	public String getGameName() {
+		return gameName;
 	}
-	public void setGameId(Integer gameId) {
-		this.gameId = gameId;
+	public void setGameName(String gameName) {
+		this.gameName = gameName;
 	}
 	public Integer getScore() {
 		return score;

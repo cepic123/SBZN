@@ -293,20 +293,23 @@ public class GameService {
 		kieSession.fireAllRules();
 		kieSession.dispose();
 		
+		List<TopListDTO> topList = new ArrayList<TopListDTO>();
 		for(TLDTO tlDTO: tlDTOS) {
 			System.out.println("GAME NAME: " + tlDTO.getGame().getName());
 			System.out.println("GAME RATING: " + tlDTO.getRating());
 			System.out.println("REVIEW CATEGORY: " + tlDTO.getReviewCategory());
 			System.out.println("STUDIO RATING: " + tlDTO.getStudioRating());
+			
+			topList.add(new TopListDTO(tlDTO.getGame().getName(), tlDTO.getRating()));
 		}
-		return null;
+		return topList;
 	}
 	
-	public String save(GameDTO gameInfo) throws NoSuchElementException {
+	public List<TopListDTO> save(GameDTO gameInfo) throws NoSuchElementException {
 		Game g = new Game();
 		g.setName(gameInfo.getName());
 		g.setLenght(gameInfo.getLenght());
-		g.setStudio(studioRepository.findById(gameInfo.getStudioId()).get());
+		g.setStudio(studioRepository.findByName(gameInfo.getStudioName()).get());
 		g.setPrice(gameInfo.getPrice());
 		g.setMultiplayer(gameInfo.isMultiplayer());
 		g.setOnline(gameInfo.isOnline());
@@ -315,7 +318,12 @@ public class GameService {
 		gameRepository.save(g);
 
 		kieSession.insert(new GameEvent(g));
-		System.out.println(kieSession.fireAllRules());
-		return "Success";
+		//System.out.println(kieSession.fireAllRules());
+		Integer done =  kieSession.fireAllRules();
+		
+		if(done >= 3) {
+			return getTopList();
+		}
+		return null;
 	}
 }

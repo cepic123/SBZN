@@ -34,7 +34,7 @@ public class GameController {
 	}
 	
 	@PostMapping("/save")
-	public String save(@RequestBody GameDTO gameDTO) {
+	public List<TopListDTO> save(@RequestBody GameDTO gameDTO) {
 		return gameService.save(gameDTO);
 	}
 }
