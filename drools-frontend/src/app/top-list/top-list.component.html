@@ -1,0 +1,36 @@
+<div>
+  <mat-form-field appearance="fill">
+    <mat-select placeholder="Choose game" [(value)]="selectedGame">
+      <mat-option *ngFor="let game of gameList" [value]="game">{{
+            game
+          }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-select placeholder="0" [(value)]="selectedScore">
+      <mat-option *ngFor="let grade of gradeList" [value]="grade">{{
+            grade
+          }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <button id="basic" type="button" mat-button (click)="setReview()" color="primary">
+    Rate game
+  </button>
+
+  <table mat-table [dataSource]="topList" class="mat-elevation-z8" *ngIf="topList.length > 0">
+    <ng-container matColumnDef="Name">
+      <th mat-header-cell *matHeaderCellDef>Name</th>
+      <td mat-cell *matCellDef="let element">{{ element.gameName }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="Points">
+      <th mat-header-cell *matHeaderCellDef>Points</th>
+      <td mat-cell *matCellDef="let element">{{ element.points.toFixed(1) }}</td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+</div>
